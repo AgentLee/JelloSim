@@ -19,8 +19,10 @@ public:
 	std::vector<Eigen::Matrix<T,3,1>> vel;
 	std::vector<Eigen::Matrix<T,3,1>> pos;
 
-public:
 	Particles(int n, T initialMass);
 	void initializeParticles_random();
 	void updateParticlePositions(T dt);
+
+	// Reads Tetgen file and stores data
+	void readTetgen();
 };

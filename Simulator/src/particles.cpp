@@ -35,3 +35,8 @@ void Particles::updateParticlePositions(T dt)
 		pos[i](2,0) += vel[i](2,0)*dt;
 	}
 }
+
+void Particles::readTetgen()
+{
+	// TODO
+}

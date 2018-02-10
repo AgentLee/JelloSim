@@ -16,7 +16,13 @@ add_cispba_executable(  sim
 						src/particles.h
 						src/particles.cpp
 						src/triangles.h
-						src/triangles.cpp )
+						src/triangles.cpp 
+						src/tetrahedron.h
+						src/tetrahedron.cpp
+						src/sim.h
+						src/sim.cpp
+						src/collisions.h
+						src/sdf.h )
 target_link_libraries(sim partio)
 
 target_include_directories(sim SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR})

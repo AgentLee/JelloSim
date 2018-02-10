@@ -4,6 +4,15 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
+#include <memory>
+#include <iostream>
+
+#include "src/particles.h"
+#include "src/triangles.h"
+
+#include "src/utilities.h"
+#include "src/forces.h"
+
 using T = double;
 constexpr int dim = 3;
 

@@ -9,8 +9,15 @@ if(CREATE_LOCAL_MAKEFILES)
 endif()
 
 # Configure this project
-add_cispba_executable(simulator main.cpp)
-target_link_libraries(simulator partio)
+add_cispba_executable(  sim 
+						main.cpp
+						src/forces.h
+						src/utilities.h
+						src/particles.h
+						src/particles.cpp
+						src/triangles.h
+						src/triangles.cpp )
+target_link_libraries(sim partio)
 
-target_include_directories(simulator SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR})
-target_link_libraries(simulator eigen)
+target_include_directories(sim SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR})
+target_link_libraries(sim eigen)

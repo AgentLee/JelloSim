@@ -122,5 +122,6 @@ endfunction(add_cispba_plugin)
 enable_testing()
 
 add_subdirectory(Deps)
-add_subdirectory(Projects)
+#add_subdirectory(Projects)
+add_subdirectory(Simulator)
 #add_subdirectory(Scripts)

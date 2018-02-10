@@ -1,6 +1,8 @@
 #include <Partio.h>
 #include <vector>
 #include <string>
+#include <Eigen/Core>
+#include <Eigen/Dense>
 
 using T = double;
 constexpr int dim = 3;
@@ -35,5 +37,9 @@ int main(int argc, char* argv[])
     std::string file="test.pda";
     writePartio<T,dim>(file);
     
+    Eigen::Matrix<T,dim,1> x;
+    x << (T).1, (T).2, (T).3;
+    std::cout << x.transpose() << std::endl;
+
     return 0;
 }

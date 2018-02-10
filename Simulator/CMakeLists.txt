@@ -9,6 +9,8 @@ if(CREATE_LOCAL_MAKEFILES)
 endif()
 
 # Configure this project
-add_cispba_executable(eigen_example main.cpp)
-target_include_directories(eigen_example SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR})
-target_link_libraries(eigen_example eigen)
+add_cispba_executable(simulator main.cpp)
+target_link_libraries(simulator partio)
+
+target_include_directories(simulator SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR})
+target_link_libraries(simulator eigen)

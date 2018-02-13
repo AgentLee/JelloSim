@@ -1,0 +1,85 @@
+Setup:
+    cd <tetgen-directory>
+    mkdir build
+    cd build
+    cmake ..
+    make
+    
+Usage:
+1............................ HELP ....
+    ./tetgen -h 
+        // to get the list of options and help
+    
+    
+2............................ GENEARATE TETRAHEDRAL MESH [DEFAULT]....
+    ./tetgen -p example.poly
+
+        // With the -p switch, TetGen will read the file, i.e., example.poly, 
+        and generate its constrained Delaunay tetrahedralization. 
+        The resulting mesh is saved in four files: example.1.node, 
+        example.1.ele, example.1.face, and example.1.edge, which are a list 
+        of mesh nodes, tetrahedra, boundary faces, and boundary edges, 
+        respectively. The file formats of TetGen are described in Section 5. 
+
+        
+3............................ GENEARATE TETRAHEDRAL MESH [FINER] ....
+        // The above mesh is pretty coarse, and contains many badly-shaped 
+        (e.g., long and skinny) tetrahedra. Now try:
+
+    tetgen -pq example.poly
+
+        // The -q switch triggers the mesh refinement such that Steiner points 
+        are added to remove badly-shaped tetrahedra. The resulting mesh is 
+        contained in the same four files as before. However, now it is a 
+        quality tetrahedral mesh whose tetrahedra have no small face angle 
+        less than about 14o (the default quality value). 
+
+4............................ GENEARATE TETRAHEDRAL MESH [FINER + MORE CONTROL 
+                                + MESH QUALITY REPORT] ....
+    tetgen -pq1.2V example.poly
+
+        // TetGen will again generate a quality mesh, which contains 
+        more points than the previous one, and all tetrahedra have 
+        radius-edge ratio bounded by 1.2, i.e., the element shapes are better 
+        than those in the previous mesh. In addition, TetGen prints a mesh 
+        quality report (due to the -V switch)
+
+5............................ GENEARATE TETRAHEDRAL MESH [FINER + MORE CONTROL 
+                                + MESH QUALITY REPORT + VOLUME CONSTRAINT] .... 
+        // Instead of using the -q switch to get a finer mesh, one can use the 
+        -a switch to impose a maximum volume constraint on the resulting 
+        tetrahedra. By doing so, no tetrahedron in the resulting mesh has 
+        volume bigger than the specified value after -a. Try to run the 
+        following command.
+
+    tetgen -pq1.2Va1 example.poly
+
+        // Now the resulting mesh should contain much more vertices than the 
+        previous one. Besides of -q and -a switches, TetGen provides more 
+        switches to control the mesh element size and shape. They are described 
+        in Section 4. 
+
+2............................ OUTPUT AND VISUALIZATION ....
+    tetgen output format description: 
+        http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#sec%3Aff
+        http://wias-berlin.de/software/tetgen/1.5/fformats.examples.html
+        
+    Use tetview to visualize the result.. alternatively you can use Medit..
+    
+    IMPORTANT: https://www.ljll.math.upmc.fr/frey/software.html
+    
+    For viewing mesh under Medit, add a -g switch in the command line. TetGen 
+    will additionally output a file named example.1.mesh, which can be read and 
+    rendered directly by TetGen. Try running:
+
+    tetgen -pg example.poly
+    medit example.1
+
+3.............................. TLDR ....
+    Run this:
+    Mesh Generation:
+        ./tetgen -pgq1.2Va0.0625 ../meshes/example_poly/example.poly
+    Visualize:
+        ./medit-2.3-linux ../meshes/example_poly/example.1.mesh
+        
+

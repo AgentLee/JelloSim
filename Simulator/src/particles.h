@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <fstream>
 
 #include <stdlib.h>
 #include <time.h>
@@ -24,5 +25,5 @@ public:
 	void updateParticlePositions(T dt);
 
 	// Reads Tetgen file and stores data
-	void readTetgen();
+	void readNode(const std::string &inputFileName);
 };

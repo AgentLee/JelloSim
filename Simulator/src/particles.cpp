@@ -36,7 +36,55 @@ void Particles::updateParticlePositions(T dt)
 	}
 }
 
-void Particles::readTetgen()
+
+/*
+ *  .node FILE FORMAT:
+ *      http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html
+ *
+ *  First line:
+ *              <# of points> <dimension (3)> <# of attributes> <boundary markers (0 or 1)>
+ *
+ *  Remaining lines list # of points:
+ *              <point #> <x> <y> <z> [attributes] [boundary marker]
+ *
+ */
+
+// helper function
+void readLine(std::ifstream &fin, int numDims, int numAtt)
+{
+    float f;
+    fin >> f; // first one is id..
+    for(int i = 0; i < numDims; ++i)
+    {
+        fin >> pos[f](i, 0);
+    }
+
+    for(int i = 0; i < numAtt; ++i)
+    {
+        float someAttribute;
+        fin >> someAttribute;
+    }
+}
+
+void Particles::readNode(const std::string &inputFileName)
 {
 	// TODO
+	std::ifstream fin(inputFileName);
+
+    if(fin.is_open())
+    {
+        int numPoints;
+        int numDims;
+        int numAtts;
+        int boundaryMarker;
+
+        fin >> numPoints >> numDims >> numAtts >> boundaryMarker;
+
+        for(int i = 0; i < numPoints; ++i)
+        {
+            readLine(fin, numDims, numAtts);
+        }
+
+        fin.close();
+    }
 }

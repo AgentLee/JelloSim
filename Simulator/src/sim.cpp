@@ -42,8 +42,17 @@ void checkCollisions()
     // Later do interobject collisions with a grid+bounding box or BVH
 }
 
+// Reads all the required files and stores stuff in respective arrays
+//void tetRead()
+//{
+//    // read node file and store list of points (id, pos, attributes)
+//    // read .ele file and store tetrahedra (id, nodes)
+//    // can read more files for faces, edges, etc.
+//}
+
 void sim()
 {
-    std::vector<Tetrahedron> tetras;    
+    std::shared_ptr<Tetrahedron> tetras;
     std::shared_ptr<Particles> particles;
 }
+

@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <fstream>
 
 #include <stdlib.h>
 #include <time.h>
@@ -14,5 +15,8 @@ class Tetrahedron
 public:
 	Tetrahedron();
 
-    Eigen::Matrix<uint, 4, 1> particleIndices;
+    int numTetra;
+    std::vector<Eigen::Matrix<uint, 4, 1>> particleIndices;
+
+	void readEle(const std::string &inputFileName);
 };

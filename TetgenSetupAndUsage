@@ -59,7 +59,7 @@ Usage:
         switches to control the mesh element size and shape. They are described 
         in Section 4. 
 
-2............................ OUTPUT AND VISUALIZATION ....
+6............................ OUTPUT AND VISUALIZATION ....
     tetgen output format description: 
         http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html#sec%3Aff
         http://wias-berlin.de/software/tetgen/1.5/fformats.examples.html
@@ -75,7 +75,7 @@ Usage:
     tetgen -pg example.poly
     medit example.1
 
-3.............................. TLDR ....
+7.............................. TLDR ....
     Run this:
     Mesh Generation:
         ./tetgen -pgq1.2Va0.0625 ../meshes/example_poly/example.poly

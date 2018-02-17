@@ -18,7 +18,7 @@ Tetrahedron::Tetrahedron()
  */
 
 // helper function
-void readLine(std::ifstream &fin, int nodesPerTet)
+void Tetrahedron::tetgen_readLine(std::ifstream &fin, int nodesPerTet)
 {
     float f;
     fin >> f; // first one is id..
@@ -29,7 +29,7 @@ void readLine(std::ifstream &fin, int nodesPerTet)
     }
 }
 
-void Tetrahedron::readEle(const std::string &inputFileName)
+void Tetrahedron::tetgen_readEleFile(const std::string &inputFileName)
 {
     // TODO
     std::ifstream fin(inputFileName);
@@ -44,7 +44,7 @@ void Tetrahedron::readEle(const std::string &inputFileName)
 
         for(int i = 0; i < numTet; ++i)
         {
-            readLine(fin, nodesPerTet);
+            tetgen_readLine(fin, nodesPerTet);
         }
 
         fin.close();

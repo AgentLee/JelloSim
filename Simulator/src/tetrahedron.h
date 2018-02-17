@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "particles.h"
+
 class Tetrahedron
 {
 public:
@@ -18,5 +20,7 @@ public:
     int numTetra;
     std::vector<Eigen::Matrix<uint, 4, 1>> particleIndices;
 
-	void readEle(const std::string &inputFileName);
+    // Reads Tetgen file and stores data
+    void tetgen_readLine(std::ifstream &fin, int nodesPerTet);
+	void tetgen_readEleFile(const std::string &inputFileName);
 };

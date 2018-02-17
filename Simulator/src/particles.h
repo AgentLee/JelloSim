@@ -25,5 +25,6 @@ public:
 	void updateParticlePositions(T dt);
 
 	// Reads Tetgen file and stores data
-	void readNode(const std::string &inputFileName);
+	void tetgen_readLine(std::ifstream &fin, int numDims, int numAtt);
+	void tetgen_readNode(const std::string &inputFileName);
 };

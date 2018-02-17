@@ -4,18 +4,21 @@
 
 #include "sim.h"
 
-void init()
+Sim::Sim(std::shared_ptr<Tetrahedron> tetrahedronList, std::shared_ptr<Particles> particleList) : tetras(tetrahedronList), vertices(particleList)
+{}
+
+void Sim::init()
 {
     // TODO
     // Precompute rest deformation (Dm), volume, inverse Dm
 }
 
-void eulerIntegration()
+void Sim::eulerIntegration()
 {
     // TODO
 }
 
-void update()
+void Sim::update()
 {
     // TODO
     // ***** BETTER DOUBLE CHECK WITH LADISLAV'S VIDEO BOI *****
@@ -35,7 +38,7 @@ void update()
     //      eulerIntegration()
 }
 
-void checkCollisions()
+void Sim::checkCollisions()
 {
     // TODO
     // First do brute force SDF for primitives
@@ -50,9 +53,5 @@ void checkCollisions()
 //    // can read more files for faces, edges, etc.
 //}
 
-void sim()
-{
-    std::shared_ptr<Tetrahedron> tetras;
-    std::shared_ptr<Particles> particles;
-}
+
 

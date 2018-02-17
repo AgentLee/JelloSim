@@ -50,14 +50,15 @@ void Particles::updateParticlePositions(T dt)
  */
 
 // helper function
-void readLine(std::ifstream &fin, int numDims, int numAtt)
+void Particles::tetgen_readLine(std::ifstream &fin, int numDims, int numAtt)
 {
     float f;
     fin >> f; // first one is id..
     for(int i = 0; i < numDims; ++i)
     {
-        fin >> pos[f](i, 0);
+        fin >> pos[f-1](i, 0);
     }
+    // std::cout << pos[f-1](0, 0) << " " << pos[f-1](1, 0) << " " << pos[f-1](2, 0) << "\n";
 
     for(int i = 0; i < numAtt; ++i)
     {
@@ -66,7 +67,7 @@ void readLine(std::ifstream &fin, int numDims, int numAtt)
     }
 }
 
-void Particles::readNode(const std::string &inputFileName)
+void Particles::tetgen_readNode(const std::string &inputFileName)
 {
 	// TODO
 	std::ifstream fin(inputFileName);
@@ -80,9 +81,15 @@ void Particles::readNode(const std::string &inputFileName)
 
         fin >> numPoints >> numDims >> numAtts >> boundaryMarker;
 
+        //Resizing all vectors in Particles
+        numParticles = numPoints;
+        mass.resize(numPoints, 1.0f); //giving mass of 1 to all particles
+        vel.resize(numPoints);
+        pos.resize(numPoints);
+
         for(int i = 0; i < numPoints; ++i)
         {
-            readLine(fin, numDims, numAtts);
+            tetgen_readLine(fin, numDims, numAtts);
         }
 
         fin.close();

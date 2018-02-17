@@ -88,6 +88,13 @@ namespace Utils
 		Utils::create_objFile(fileName, particles, triangles);
 	}
 
+	void inline generateTriObjFile( std::shared_ptr<Triangles> triangles,  std::shared_ptr<Particles> particles, const std::string& fileName, const std::string& objFileName )
+	{
+		//generate obj file
+		triangles->tetgen_readFace(fileName);
+		Utils::create_objFile(objFileName, particles, triangles);
+	}
+
 	template<typename T>
 	std::vector<T> split(const std::string& line) 
 	{

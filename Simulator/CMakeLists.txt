@@ -17,8 +17,8 @@ add_cispba_executable(  sim
 						src/particles.cpp
 						src/triangles.h
 						src/triangles.cpp 
-						src/tetrahedron.h
-						src/tetrahedron.cpp
+						src/tetrahedrons.h
+						src/tetrahedrons.cpp
 						src/sim.h
 						src/sim.cpp
 						src/collisions.h

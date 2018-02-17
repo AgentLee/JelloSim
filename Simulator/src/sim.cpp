@@ -4,13 +4,18 @@
 
 #include "sim.h"
 
-Sim::Sim(std::shared_ptr<Tetrahedron> tetrahedronList, std::shared_ptr<Particles> particleList) : tetras(tetrahedronList), vertices(particleList)
+Sim::Sim(std::shared_ptr<Tetrahedrons> tetrahedronList, std::shared_ptr<Particles> particleList) : tetras(tetrahedronList), vertices(particleList)
 {}
 
 void Sim::init()
 {
-    // TODO
-    // Precompute rest deformation (Dm), volume, inverse Dm
+    // Precompute rest deformation (Dm), volume, inverse Dm for each tetrahedron
+    for(int i=0; i<tetras->numTetra; i++)
+    {
+        tetras->computeRestDeformation( i, vertices );
+        tetras->computeInvRestDeformation( i );
+        tetras->computeUndeformedVolume( i );
+    }
 }
 
 void Sim::eulerIntegration()
@@ -52,6 +57,3 @@ void Sim::checkCollisions()
 //    // read .ele file and store tetrahedra (id, nodes)
 //    // can read more files for faces, edges, etc.
 //}
-
-
-

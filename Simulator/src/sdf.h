@@ -4,12 +4,7 @@
 
 #include <iostream>
 #include <vector>
-#include <string>
 #include <stdlib.h>
-#include <time.h>
-
-#include "tetrahedron.h"
-#include "particles.h"
 
 using T = double;
 
@@ -26,6 +21,6 @@ namespace SDF
     // p must be in local space
     float inline sdSphere(Eigen::Matrix<T, 3, 1> p, float s)
     {
-        return p.norm - s;
+        return p.norm() - s;
     }
 }

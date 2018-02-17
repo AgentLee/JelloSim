@@ -10,16 +10,17 @@
 
 #include <memory>
 
-#include "tetrahedron.h"
+#include "tetrahedrons.h"
 #include "particles.h"
+#include "sdf.h"
 
 class Sim
 {
 public:
-	std::shared_ptr<Tetrahedron> tetras;
+	std::shared_ptr<Tetrahedrons> tetras;
 	std::shared_ptr<Particles> vertices;
 
-	Sim(std::shared_ptr<Tetrahedron> tetrahedronList, std::shared_ptr<Particles> particleList);
+	Sim(std::shared_ptr<Tetrahedrons> tetrahedronList, std::shared_ptr<Particles> particleList);
 
 	void init();
 	void eulerIntegration();

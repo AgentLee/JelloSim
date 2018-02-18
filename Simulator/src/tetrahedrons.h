@@ -32,6 +32,8 @@ public:
     void computeInvRestDeformation( uint tetraIndex ); // Calculate inverse rest Deformation
     void computeUndeformedVolume( uint tetraIndex ); // Calculate undeformed Volume
 
+    void computeNewDeformation( Eigen::Matrix<T, 3, 3> newDef, uint tetraIndex ); // Calculate new deformation
+
     // Reads Tetgen file and stores data
     void tetgen_readLine(std::ifstream &fin, int nodesPerTet);
 	void tetgen_readEleFile(const std::string &inputFileName);

@@ -19,6 +19,7 @@ public:
 	std::vector<T> mass;
 	std::vector<Eigen::Matrix<T,3,1>> vel;
 	std::vector<Eigen::Matrix<T,3,1>> pos;
+	std::vector<Eigen::Matrix<T,3,1>> force;
 
 	Particles(int n, T initialMass);
 	void initializeParticles_random();

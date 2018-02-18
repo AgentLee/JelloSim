@@ -10,9 +10,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8138f11c-1fda-4fa5-898c-9347342a6b2c" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/Simulator/main.cpp" afterPath="$PROJECT_DIR$/Simulator/main.cpp" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/Simulator/src/particles.cpp" afterPath="$PROJECT_DIR$/Simulator/src/particles.cpp" />
+      <change beforePath="$PROJECT_DIR$/Simulator/src/particles.h" afterPath="$PROJECT_DIR$/Simulator/src/particles.h" />
       <change beforePath="$PROJECT_DIR$/Simulator/src/sim.cpp" afterPath="$PROJECT_DIR$/Simulator/src/sim.cpp" />
-      <change beforePath="$PROJECT_DIR$/Simulator/src/tetrahedron.cpp" afterPath="$PROJECT_DIR$/Simulator/src/tetrahedron.cpp" />
+      <change beforePath="$PROJECT_DIR$/Simulator/src/sim.h" afterPath="$PROJECT_DIR$/Simulator/src/sim.h" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -87,11 +89,12 @@
       <workItem from="1518896995942" duration="30000" />
       <workItem from="1518897047483" duration="516000" />
       <workItem from="1518899196558" duration="342000" />
+      <workItem from="1518924189129" duration="226000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="902000" />
+    <option name="totallyTimeSpent" value="1128000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="260" y="20" width="1400" height="990" extended-state="0" />

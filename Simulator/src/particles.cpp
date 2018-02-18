@@ -13,6 +13,9 @@ Particles::Particles(int n, T initialMass): numParticles(n)
 
 		Eigen::Matrix<T,3,1> pos_particle = Eigen::Matrix<T,3,1>::Zero();
 		pos.push_back(pos_particle);
+
+        Eigen::Matrix<T,3,1> force_particle = Eigen::Matrix<T,3,1>::Zero();
+        force.push_back(force_particle);
 	}
 }
 
@@ -86,6 +89,7 @@ void Particles::tetgen_readNode(const std::string &inputFileName)
         mass.resize(numPoints, 1.0f); //giving mass of 1 to all particles
         vel.resize(numPoints);
         pos.resize(numPoints);
+        force.resize(numPoints);
 
         for(int i = 0; i < numPoints; ++i)
         {

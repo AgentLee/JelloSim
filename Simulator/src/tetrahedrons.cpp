@@ -35,7 +35,7 @@ void Tetrahedrons::computeUndeformedVolume( uint tetraIndex )
     undeformedVolume[tetraIndex] = oneSixth * std::abs( restDeformation[tetraIndex].determinant() );
 }
 
-void computeNewDeformation( Eigen::Matrix<T, 3, 3> newDef, uint tetraIndex )
+void Tetrahedrons::computeNewDeformation( Eigen::Matrix<T, 3, 3> newDef, uint tetraIndex, std::shared_ptr<Particles> vertices )
 {
     Eigen::Matrix<uint, 4, 1> vertexIndices = particleIndices[tetraIndex];
 

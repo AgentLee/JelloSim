@@ -26,7 +26,7 @@ void Sim::clean()
 	//Set forces for all vertices/particles to zero
 	for(int i=0; i<vertices->numParticles; i++)
 	{
-		vertices->forces[i] = MatrixXf::Zero(3,1);
+		vertices->force[i] = Eigen::Matrix<T, 3, 1>::Zero();
 	}
 }
 
@@ -35,7 +35,7 @@ void Sim::eulerIntegration()
 // TODO
 }
 
-bool Sim::checkHashElasticForces( int i, int j, Eigen::Matrix<T,3,1>& force );
+bool Sim::checkHashElasticForces( int i, int j, Eigen::Matrix<T,3,1>& force )
 {
 	long key1 = 1000000000 * i + j;
 	long key2 = 1000000000 * j + i;
@@ -51,8 +51,8 @@ bool Sim::checkHashElasticForces( int i, int j, Eigen::Matrix<T,3,1>& force );
 
 void Sim::computeElasticForce( int tetraIndex )
 {
-	newDeformation = Eigen::Matrix<T, 3, 3>::Zero(); //Ds
-	tetras->computeNewDeformation( newDeformation, tetraIndex );
+	Eigen::Matrix<T,3,3> newDeformation = Eigen::Matrix<T, 3, 3>::Zero(); //Ds
+	tetras->computeNewDeformation( newDeformation, tetraIndex, vertices );
 
 	//      Compute force = Ds(Dm inv)
 	//      Compute Piola (P) -- Need a table of values

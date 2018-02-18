@@ -32,7 +32,7 @@ public:
 
 	void init();
 	void clean();
-	bool checkHashElasticForces( int i, int j );
+	bool checkHashElasticForces( int i, int j, Eigen::Matrix<T,3,1>& force );
 	void computeElasticForce( int tetraIndex );
 	void eulerIntegration();
 	void update();

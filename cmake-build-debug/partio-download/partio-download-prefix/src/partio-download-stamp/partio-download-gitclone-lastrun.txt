@@ -1,3 +1,0 @@
-repository='https://github.com/wdas/partio.git'
-module=''
-tag=''

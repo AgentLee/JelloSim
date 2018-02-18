@@ -1,2 +1,9 @@
 Build/
+cmake-build-debug/
+.idea/
+
 Projects/Makefile
+Simulator/Makefile
+Simulator/sim
+Simulator/sim_debug
+

@@ -28,11 +28,16 @@ public:
     std::vector<Eigen::Matrix<T, 3, 3>> restDeformation; //Dm
     std::vector<Eigen::Matrix<T, 3, 3>> restInverseDeformation; //Dm inverse
 
+    // Precompute
     void computeRestDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices ); // Calculate rest Deformation
     void computeInvRestDeformation( uint tetraIndex ); // Calculate inverse rest Deformation
     void computeUndeformedVolume( uint tetraIndex ); // Calculate undeformed Volume
 
-    void computeNewDeformation( Eigen::Matrix<T, 3, 3> newDef, uint tetraIndex, std::shared_ptr<Particles> vertices ); // Calculate new deformation
+    // Main Update Loop
+    Eigen::Matrix<T,3,3> computeNewDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices ); // Calculate new deformation
+    Eigen::Matrix<T,3,3> computeF( uint tetraIndex ); // Calculate F
+    Eigen::Matrix<T,3,3> computeP( uint tetraIndex, std::shared_ptr<Particles> vertices ); // Calculate P
+    Eigen::Matrix<T,3,3> computeH( uint tetraIndex, std::shared_ptr<Particles> vertices ); // Calculate H
 
     // Reads Tetgen file and stores data
     void tetgen_readLine(std::ifstream &fin, int nodesPerTet);

@@ -20,9 +20,6 @@ void Sim::init()
 
 void Sim::clean()
 {
-	//Clear all hash tables
-	collisionForceMap.clear();
-	elasticForceMap.clear();
 	//Set forces for all vertices/particles to zero
 	for(int i=0; i<vertices->numParticles; i++)
 	{
@@ -35,53 +32,27 @@ void Sim::eulerIntegration()
 // TODO
 }
 
-bool Sim::checkHashElasticForces( int i, int j, Eigen::Matrix<T,3,1>& force )
-{
-	long key1 = 1000000000 * i + j;
-	long key2 = 1000000000 * j + i;
-
-	if( elasticForceMap.find(key1) != elasticForceMap.end() || 
-		elasticForceMap.find(key2) != elasticForceMap.end() )
-	{
-		force = elasticForceMap.find(key1)->second;
-		return true;
-	}
-	return false;
-}
-
 void Sim::computeElasticForce( int tetraIndex )
 {
-	Eigen::Matrix<T,3,3> newDeformation = Eigen::Matrix<T, 3, 3>::Zero(); //Ds
-	tetras->computeNewDeformation( newDeformation, tetraIndex, vertices );
+	Eigen::Matrix<T, 3, 3>::Zero(); //Ds
 
-	//      Compute force = Ds(Dm inv)
-	//      Compute Piola (P) -- Need a table of values
-	//      Compute Energy (H)
-	//      Add energy to forces (f += h)
-	//      f4 += -(h1 + h2 + h3)
+	// Compute Ds, the new deformation
+	// Eigen::Matrix<T,3,3> newDeformation = tetras->computeNewDeformation( tetraIndex, vertices );
+
+	// Eigen::Matrix<T,3,3> F = tetras->computeF( tetraIndex ); // Compute F = Ds(Dm inv)
+	// Eigen::Matrix<T,3,3> P = tetras->computeP( tetraIndex, vertices ); // Compute Piola (P)
+	// Eigen::Matrix<T,3,3> H = tetras->computeH( tetraIndex, vertices ); // Compute Energy (H)
+
+	// Add energy to forces (f += h)
+	// f4 += -(h1 + h2 + h3)
 }
 
 void Sim::update()
 {
-	// TODO
-	// ***** BETTER DOUBLE CHECK WITH LADISLAV'S VIDEO BOI *****
-
-	clean(); //clears forces and hash tables
+	clean(); //clears forces
 	checkCollisions(); //Apply Forces to particles that occur through collision
-	
+
 	// Loop through tetras
-
-	//		since 2 tetrahedrons can share one or more edges, create a hash table to check if the force along a certain edge has already been calculated.
-
-	//      Compute new deformation (Ds)
-	//      Compute force = Ds(Dm inv)
-	//      Compute Piola (P) -- Need a table of values
-	//      Compute Energy (H)
-	//      Add energy to forces (f += h)
-	//      f4 += -(h1 + h2 + h3)
-
-	//      eulerIntegration()
-
 	for(int i=0; i<tetras->numTetra; i++)
 	{
 		computeElasticForce(i);

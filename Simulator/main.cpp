@@ -49,6 +49,7 @@ int main(int argc, char* argv[])
 	for(int i=beginFrame; i<=endFrame; i++)
 	{
 		sim->update();
+		//create bgeo file for current frame
 	}
 
 	return 0;

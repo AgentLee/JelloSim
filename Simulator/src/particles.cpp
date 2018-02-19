@@ -4,41 +4,57 @@ using T = double;
 
 Particles::Particles(int n, T initialMass): numParticles(n)
 {
-	for(int i=0; i<numParticles; i++)
-	{
-		mass.push_back(initialMass);
-		
-		Eigen::Matrix<T,3,1> vel_particle = Eigen::Matrix<T,3,1>::Zero();
-		vel.push_back(vel_particle);
+    for(int i=0; i<numParticles; i++)
+    {
+        mass.push_back(initialMass);
+        
+        Eigen::Matrix<T,3,1> vel_particle = Eigen::Matrix<T,3,1>::Zero();
+        vel.push_back(vel_particle);
 
-		Eigen::Matrix<T,3,1> pos_particle = Eigen::Matrix<T,3,1>::Zero();
-		pos.push_back(pos_particle);
+        Eigen::Matrix<T,3,1> pos_particle = Eigen::Matrix<T,3,1>::Zero();
+        pos.push_back(pos_particle);
 
         Eigen::Matrix<T,3,1> force_particle = Eigen::Matrix<T,3,1>::Zero();
         force.push_back(force_particle);
-	}
+    }
 }
 
+/* 
+ * Initialize all particles with random values
+ */
 void Particles::initializeParticles_random()
 {
-	for(int i=0; i<numParticles; i++)
-	{
-		mass[i] = std::rand() % 100;
-		vel[i] = Eigen::Matrix<T,3,1>::Random(3,1);
-		pos[i] = Eigen::Matrix<T,3,1>::Random(3,1);
-	}
+    for(int i=0; i<numParticles; i++)
+    {
+        mass[i] = std::rand() % 100;
+        vel[i] = Eigen::Matrix<T,3,1>::Random(3,1);
+        pos[i] = Eigen::Matrix<T,3,1>::Random(3,1);
+    }
 }
 
+/* 
+ * Using sympledic Euler to update speed and velocity based on 
+ * the force, mass and previous state
+ */
 void Particles::updateParticlePositions(T dt)
 {
-	for(int i=0; i<numParticles; i++)
-	{
-		pos[i](0,0) += vel[i](0,0)*dt;
-		pos[i](1,0) += vel[i](1,0)*dt;
-		pos[i](2,0) += vel[i](2,0)*dt;
-	}
+    for(int i=0; i<numParticles; i++)
+    {
+        pos[i](0,0) += vel[i](0,0)*dt;
+        pos[i](1,0) += vel[i](1,0)*dt;
+        pos[i](2,0) += vel[i](2,0)*dt;
+    }
 }
 
+void Particles::updateParticleVelocity(T dt)
+{
+    for(int i=0; i<numParticles; i++)
+    {
+        vel[i](0,0) += force[i](0,0) / mass[i] * dt;
+        vel[i](1,0) += force[i](1,0) / mass[i] * dt;
+        vel[i](2,0) += force[i](2,0) / mass[i] * dt;
+    }
+}
 
 /*
  *  .node FILE FORMAT:
@@ -72,8 +88,8 @@ void Particles::tetgen_readLine(std::ifstream &fin, int numDims, int numAtt)
 
 void Particles::tetgen_readNode(const std::string &inputFileName)
 {
-	// TODO
-	std::ifstream fin(inputFileName);
+    // TODO
+    std::ifstream fin(inputFileName);
 
     if(fin.is_open())
     {

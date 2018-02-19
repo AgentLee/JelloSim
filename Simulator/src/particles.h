@@ -24,6 +24,7 @@ public:
 	Particles(int n, T initialMass);
 	void initializeParticles_random();
 	void updateParticlePositions(T dt);
+	void updateParticleVelocity(T dt);
 
 	// Reads Tetgen file and stores data
 	void tetgen_readLine(std::ifstream &fin, int numDims, int numAtt);

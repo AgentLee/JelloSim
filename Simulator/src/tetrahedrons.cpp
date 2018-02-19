@@ -55,26 +55,33 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeNewDeformation( uint tetraIndex, std
     return newDef;
 }
 
-Eigen::Matrix<T, 3, 3> Tetrahedrons::computeF( uint tetraIndex )
+Eigen::Matrix<T, 3, 3> Tetrahedrons::computeF( uint tetraIndex, Eigen::Matrix<T,3,3>& Ds )
 {
-    // Eigen::Matrix<uint, 4, 1> vertexIndices = particleIndices[tetraIndex];
-    Eigen::Matrix<T, 3, 3> F = Eigen::Matrix<T, 3, 3>::Zero();
-
+    Eigen::Matrix<T, 3, 3> F = Ds*restDeformation[tetraIndex];
     return F;
 }
 
-Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, std::shared_ptr<Particles> vertices )
+Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, Eigen::Matrix<T,3,3>& F )
 {
     Eigen::Matrix<T, 3, 3> P = Eigen::Matrix<T, 3, 3>::Zero();
-
     return P;
 }
 
-Eigen::Matrix<T, 3, 3> Tetrahedrons::computeH( uint tetraIndex, std::shared_ptr<Particles> vertices )
+Eigen::Matrix<T, 3, 3> Tetrahedrons::computeH( uint tetraIndex, Eigen::Matrix<T,3,3>& P, Eigen::Matrix<T,3,3>& Ds )
 {
-    Eigen::Matrix<T, 3, 3> H = Eigen::Matrix<T, 3, 3>::Zero();
-
+    Eigen::Matrix<T, 3, 3> H = -(undeformedVolume[tetraIndex] * P * Ds.transpose());
     return H;
+}
+
+void Tetrahedrons::addForces( uint tetraIndex, std::shared_ptr<Particles> vertices, Eigen::Matrix<T,3,3>& H )
+{
+    // Add forces to particles that make up the tetrahedron (f += h)
+    // f4 += -(h1 + h2 + h3)
+    Eigen::Matrix<uint, 4, 1> vertexIndices = particleIndices[tetraIndex];
+    vertices->force[vertexIndices[0]] += H.col(0);
+    vertices->force[vertexIndices[1]] += H.col(1);
+    vertices->force[vertexIndices[2]] += H.col(2);
+    vertices->force[vertexIndices[3]] += -(H.col(0) + H.col(1) + H.col(2));
 }
 
 /*

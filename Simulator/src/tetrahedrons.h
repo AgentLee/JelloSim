@@ -24,6 +24,7 @@ public:
     int numTetra;
     std::vector<Eigen::Matrix<uint, 4, 1>> particleIndices;
 
+    //Needed for FEM Calculations
     std::vector<T> undeformedVolume; //W
     std::vector<Eigen::Matrix<T, 3, 3>> restDeformation; //Dm
     std::vector<Eigen::Matrix<T, 3, 3>> restInverseDeformation; //Dm inverse
@@ -35,9 +36,12 @@ public:
 
     // Main Update Loop
     Eigen::Matrix<T,3,3> computeNewDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices ); // Calculate new deformation
-    Eigen::Matrix<T,3,3> computeF( uint tetraIndex ); // Calculate F
-    Eigen::Matrix<T,3,3> computeP( uint tetraIndex, std::shared_ptr<Particles> vertices ); // Calculate P
-    Eigen::Matrix<T,3,3> computeH( uint tetraIndex, std::shared_ptr<Particles> vertices ); // Calculate H
+    Eigen::Matrix<T,3,3> computeF( uint tetraIndex, Eigen::Matrix<T,3,3>& Ds ); // Calculate F
+    Eigen::Matrix<T,3,3> computeP( uint tetraIndex, Eigen::Matrix<T,3,3>& F ); // Calculate P
+    Eigen::Matrix<T,3,3> computeH( uint tetraIndex, Eigen::Matrix<T,3,3>& P, Eigen::Matrix<T,3,3>& Ds ); // Calculate H
+
+    //Add a force to every particle that comprises the tetrahedron
+    void addForces( uint tetraIndex, std::shared_ptr<Particles> vertices, Eigen::Matrix<T,3,3>& H );
 
     // Reads Tetgen file and stores data
     void tetgen_readLine(std::ifstream &fin, int nodesPerTet);

@@ -95,6 +95,34 @@ namespace Utils
 		Utils::create_objFile(objFileName, particles, triangles);
 	}
 
+	// Reads all the required files and stores stuff in respective arrays
+	void inline tetRead( std::shared_ptr<Particles> vertices, std::shared_ptr<Triangles> triangles, std::shared_ptr<Tetrahedrons> tetras )
+	{
+		// read node file and store list of points (id, pos, attributes)
+		// read .ele file and store tetrahedra (id, nodes)
+		// can read more files for faces, edges, etc.
+
+		//read vertices
+		std::string fileName = "../Meshes/cube_poly_1/cube.1.node";
+		vertices->tetgen_readNode( fileName );
+
+		//read faces and create obj file
+		std::string faceFile = "../Meshes/cube_poly_1/cube.1.face";
+		std::string objFileName = "../Meshes/cube_poly_1/cube.1.node";
+		Utils::generateTriObjFile( triangles, vertices, fileName, objFileName );
+
+		//read in tetrahedrons with particle indices
+		std::string eleFile = "../Meshes/cube_poly_1/cube.1.ele";
+		tetras->tetgen_readEleFile(eleFile);
+	}
+
+	void inline writeBGEOforFrame( std::string baseFileNamePoints, uint frameNumber, std::shared_ptr<Particles> vertices )
+	{
+		//create bgeo file for current frame
+		std::string pointsFile = baseFileNamePoints + std::to_string(frameNumber) + ".bgeo";
+		Utils::writePartio<T, 3>(pointsFile, vertices, vertices->numParticles);
+	}
+
 	template<typename T>
 	std::vector<T> split(const std::string& line) 
 	{

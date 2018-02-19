@@ -32,19 +32,14 @@ void Sim::eulerIntegration()
 // TODO
 }
 
-void Sim::computeElasticForce( int tetraIndex )
+void Sim::computeElasticForces( int tetraIndex )
 {
-	Eigen::Matrix<T, 3, 3>::Zero(); //Ds
+	Eigen::Matrix<T,3,3> newDeformation = tetras->computeNewDeformation( tetraIndex, vertices ); // Compute Ds, the new deformation
+	Eigen::Matrix<T,3,3> F 				= tetras->computeF( tetraIndex, newDeformation ); // Compute F = Ds(Dm_inv)
+	Eigen::Matrix<T,3,3> P 				= tetras->computeP( tetraIndex, F ); // Compute Piola (P)
+	Eigen::Matrix<T,3,3> H 				= tetras->computeH( tetraIndex, P, newDeformation ); // Compute Energy (H)
 
-	// Compute Ds, the new deformation
-	// Eigen::Matrix<T,3,3> newDeformation = tetras->computeNewDeformation( tetraIndex, vertices );
-
-	// Eigen::Matrix<T,3,3> F = tetras->computeF( tetraIndex ); // Compute F = Ds(Dm inv)
-	// Eigen::Matrix<T,3,3> P = tetras->computeP( tetraIndex, vertices ); // Compute Piola (P)
-	// Eigen::Matrix<T,3,3> H = tetras->computeH( tetraIndex, vertices ); // Compute Energy (H)
-
-	// Add energy to forces (f += h)
-	// f4 += -(h1 + h2 + h3)
+	tetras->addForces( tetraIndex, vertices, H );// Add energy to forces (f += h)
 }
 
 void Sim::update()
@@ -55,7 +50,11 @@ void Sim::update()
 	// Loop through tetras
 	for(int i=0; i<tetras->numTetra; i++)
 	{
-		computeElasticForce(i);
+		computeElasticForces(i); //computes and adds elastic forces to each particle
+	}
+
+	for(int i=0; i<tetras->numTetra; i++)
+	{
 		eulerIntegration();
 	}
 }
@@ -72,11 +71,3 @@ void Sim::checkCollisions()
 		//use hash table for this
 	}
 }
-
-// Reads all the required files and stores stuff in respective arrays
-//void tetRead()
-//{
-//    // read node file and store list of points (id, pos, attributes)
-//    // read .ele file and store tetrahedra (id, nodes)
-//    // can read more files for faces, edges, etc.
-//}

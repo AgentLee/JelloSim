@@ -27,7 +27,7 @@ public:
 
 	void init();
 	void clean();
-	void computeElasticForce( int tetraIndex );
+	void computeElasticForces( int tetraIndex );
 	void eulerIntegration();
 	void update();
 	void checkCollisions();

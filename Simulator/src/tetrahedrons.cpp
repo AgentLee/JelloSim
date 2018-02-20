@@ -1,4 +1,5 @@
 #include "tetrahedrons.h"
+#include <Eigen/Jacobi>
 
 #define oneSixth 0.166666666667
 
@@ -61,9 +62,20 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeF( uint tetraIndex, Eigen::Matrix<T,
     return F;
 }
 
-Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, Eigen::Matrix<T,3,3>& F )
+Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Matrix<T,3,3>& F )
 {
+    float mu = 0.5;
+    float lamda = 0.5;
+
     Eigen::Matrix<T, 3, 3> P = Eigen::Matrix<T, 3, 3>::Zero();
+    Eigen::JacobiSVD<Eigen::Matrix<T, 3, 3>> svd(F, Eigen::ComputeFullV | Eigen::ComputeFullU);
+    Eigen::Matrix<T,3,3> R = svd.matrixU() * svd.matrixV().transpose();
+    Eigen::Matrix<T,3,3> I = Eigen::Matrix<T, 3, 3>::Identity();
+    Eigen::Matrix<T,3,3> trTerm = R.transpose() * F - I;
+    P = 2.f * mu * (F - R) + lamda * trTerm.trace() * R;
+
+    // TODO: the +- thing mentioned in the notes after clarification in class
+
     return P;
 }
 

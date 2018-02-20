@@ -119,7 +119,9 @@ namespace Utils
 	void inline writeBGEOforFrame( std::string baseFileNamePoints, uint frameNumber, std::shared_ptr<Particles> vertices )
 	{
 		//create bgeo file for current frame
-		std::string pointsFile = baseFileNamePoints + std::to_string(frameNumber) + ".bgeo";
+		std::string pointsFile = baseFileNamePoints;
+        pointsFile += std::to_string(frameNumber);
+        pointsFile += ".bgeo";
 		Utils::writePartio<T, 3>(pointsFile, vertices, vertices->numParticles);
 	}
 

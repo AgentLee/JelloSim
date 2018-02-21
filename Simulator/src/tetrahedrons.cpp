@@ -67,15 +67,32 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Mat
     float mu = 0.5;
     float lamda = 0.5;
 
-    Eigen::Matrix<T, 3, 3> P = Eigen::Matrix<T, 3, 3>::Zero();
     Eigen::JacobiSVD<Eigen::Matrix<T, 3, 3>> svd(F, Eigen::ComputeFullV | Eigen::ComputeFullU);
-    Eigen::Matrix<T,3,3> R = svd.matrixU() * svd.matrixV().transpose();
-    Eigen::Matrix<T,3,3> I = Eigen::Matrix<T, 3, 3>::Identity();
-    Eigen::Matrix<T,3,3> trTerm = R.transpose() * F - I;
-    P = 2.f * mu * (F - R) + lamda * trTerm.trace() * R;
+    Eigen::Matrix<T, 3, 3> U = svd.matrixU();
+    Eigen::Matrix<T, 3, 3> V = svd.matrixV();
+    if (U.determinant() < 0.f) {
+        U(2) *= -1;
+    }
+    if (V.determinant() < 0.f) {
+        V(2) *= -1;
+    }
 
-    // TODO: the +- thing mentioned in the notes after clarification in class
+    Eigen::Matrix<T,3,3> R = U * V.transpose();
 
+    // USE BELOW LINES OF CODE TO USE LINEAR COROTATED METHOD
+    // Eigen::Matrix<T,3,3> I = Eigen::Matrix<T, 3, 3>::Identity();
+    // Eigen::Matrix<T,3,3> trTerm = R.transpose() * F - I;
+    // P = 2.f * mu * (F - R) + lamda * trTerm.trace() * R;
+
+    Eigen::Matrix<T,3,3> J; // jacobian matrix // TODO - Compute J. Eigen doesn't do it??
+    double j = J.determinant();
+    Eigen::Matrix<T,3,3> JFInvTr  = Eigen::Matrix<T, 3, 3>::Zero();
+    if (F.determinant() != 0) {
+        JFInvTr = j * F.inverse().transpose(); // TODO - Fix the singular matrix case.
+    }
+
+    Eigen::Matrix<T, 3, 3> P = Eigen::Matrix<T, 3, 3>::Zero();
+    P = mu * (F - R) + lamda * (j - 1.f) * JFInvTr;
     return P;
 }
 

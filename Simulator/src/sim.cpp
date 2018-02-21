@@ -4,6 +4,8 @@
 
 #include "sim.h"
 
+#define SPRING_COLLISION false
+
 Sim::Sim(std::shared_ptr<Tetrahedrons> tetrahedronList, std::shared_ptr<Particles> particleList) : tetras(tetrahedronList), vertices(particleList)
 {}
 
@@ -63,11 +65,39 @@ void Sim::checkCollisions()
 {
 	// TODO
 	// First do brute force SDF for primitives
+	// https://gamedev.stackexchange.com/questions/66636/what-are-distance-fields-and-how-are-they-applicable-to-collision-detection
+	// Transform the particles to the static mesh's local space
+	// If negative, particle went through the surface.
+	// If positive, particle didn't hit.
+	// If zero, particle on the surface.
+
 	// Later do interobject collisions with a grid+bounding box or BVH
 
-	for(int i=0; i<vertices->numParticles; i++)
+	for(int i = 0; i< vertices->numParticles; ++i)
 	{
-		//Apply force to particle once not per tetrahedron
-		//use hash table for this
+		Eigen::Matrix<T, 3, 1> v(vertices->pos.at(i));
+
+		// Transform the vertex to the plane's local space
+		// Assume the plane is at the origin
+		Eigen::Matrix<T, 4, 1> n = Eigen::Matrix<T, 4, 1>(0,1,0,0);
+		float sdf = SDF::sdPlane(v, n);
+
+		// Particle went through the surface
+		if(sdf < 0) {
+			if(SPRING_COLLISION) {
+				// Apply zero length spring
+				Eigen::Matrix<T, 3, 1> vSurf = v;
+				v[1] -= sdf;
+				
+				// WHERE IS k DEFINED
+				T k = (T)0;
+				vertices->force.at(i) += (-k * (v - vSurf));
+			}
+			else {
+				// Move the particle up to the surface
+				// Subtract the y component by the SDF	
+				vertices->pos.at(i)[1] -= sdf;
+			}
+		}
 	}
 }

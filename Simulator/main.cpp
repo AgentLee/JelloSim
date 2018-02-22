@@ -19,7 +19,7 @@ constexpr int beginFrame = 2; //1 is initial state that is written separately
 constexpr int endFrame = 120;
 const std::string baseFileNamePoints = "TestPoints/testPointsFrame";
 
-const float timeStepsPerFrame = 10.0;
+const float timeStepsPerFrame = 1.0;
 const float frameRate = 24.0;
 
 int main(int argc, char* argv[])
@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 	{
 		for(int j=0; j<=timeStepsPerFrame; j++)
 		{
-			sim->update(1 / frameRate / timeStepsPerFrame);
+			sim->update(1 / frameRate / timeStepsPerFrame / 100.0);
 		}
 		//Utils::writeBGEOforFrame( baseFileNamePoints, i, vertices );
 		std::string pointsFile = baseFileNamePoints;

@@ -8,13 +8,13 @@ Particles::Particles(int n, T initialMass): numParticles(n)
     {
         mass.push_back(initialMass);
         
-        Eigen::Matrix<T,3,1> vel_particle = Eigen::Matrix<T,3,1>::Zero();
+        Eigen::Matrix<T,1,3> vel_particle = Eigen::Matrix<T,1,3>::Zero();
         vel.push_back(vel_particle);
 
-        Eigen::Matrix<T,3,1> pos_particle = Eigen::Matrix<T,3,1>::Zero();
+        Eigen::Matrix<T,1,3> pos_particle = Eigen::Matrix<T,1,3>::Zero();
         pos.push_back(pos_particle);
 
-        Eigen::Matrix<T,3,1> force_particle = Eigen::Matrix<T,3,1>::Zero();
+        Eigen::Matrix<T,1,3> force_particle = Eigen::Matrix<T,1,3>::Zero();
         force.push_back(force_particle);
     }
 }
@@ -27,8 +27,8 @@ void Particles::initializeParticles_random()
     for(int i=0; i<numParticles; i++)
     {
         mass[i] = std::rand() % 100;
-        vel[i] = Eigen::Matrix<T,3,1>::Random(3,1);
-        pos[i] = Eigen::Matrix<T,3,1>::Random(3,1);
+        vel[i] = Eigen::Matrix<T,1,3>::Random(1,3);
+        pos[i] = Eigen::Matrix<T,1,3>::Random(1,3);
     }
 }
 
@@ -40,9 +40,7 @@ void Particles::updateParticlePositions(T dt)
 {
     for(int i=0; i<numParticles; i++)
     {
-        pos[i](0,0) += vel[i](0,0)*dt;
-        pos[i](1,0) += vel[i](1,0)*dt;
-        pos[i](2,0) += vel[i](2,0)*dt;
+        pos[i] += vel[i] * dt;
     }
 }
 
@@ -50,9 +48,7 @@ void Particles::updateParticleVelocity(T dt)
 {
     for(int i=0; i<numParticles; i++)
     {
-        vel[i](0,0) += force[i](0,0) / mass[i] * dt;
-        vel[i](1,0) += force[i](1,0) / mass[i] * dt;
-        vel[i](2,0) += force[i](2,0) / mass[i] * dt;
+        vel[i] += force[i] / mass[i] * dt;
     }
 }
 
@@ -75,7 +71,7 @@ void Particles::tetgen_readLine(std::ifstream &fin, int numDims, int numAtt)
     fin >> f; // first one is id..
     for(int i = 0; i < numDims; ++i)
     {
-        fin >> pos[f-1](i, 0);
+        fin >> pos[f-1](0,i);
     }
     // std::cout << pos[f-1](0, 0) << " " << pos[f-1](1, 0) << " " << pos[f-1](2, 0) << "\n";
 
@@ -103,7 +99,7 @@ void Particles::tetgen_readNode(const std::string &inputFileName)
         //Resizing all vectors in Particles
         numParticles = numPoints;
         mass.resize(numPoints, 1.0f); //giving mass of 1 to all particles
-        vel.resize(numPoints, Eigen::Matrix<T,3,1>::Zero());
+        vel.resize(numPoints, Eigen::Matrix<T,1,3>::Zero());
         pos.resize(numPoints);
         force.resize(numPoints);
 

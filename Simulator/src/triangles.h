@@ -14,7 +14,7 @@ class Triangles
 {
 public:
 	int numTriangles;
-	std::vector<Eigen::Matrix<uint,3,1>> triFaceList;
+	std::vector<Eigen::Matrix<uint,1,3>> triFaceList;
 
 	Triangles();
 	void addTriangle(int i, int j, int k);

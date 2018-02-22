@@ -22,7 +22,7 @@ public:
 	Tetrahedrons();
 
     int numTetra;
-    std::vector<Eigen::Matrix<uint, 4, 1>> particleIndices;
+    std::vector<Eigen::Matrix<uint, 1, 4>> particleIndices;
 
     //Needed for FEM Calculations
     std::vector<T> undeformedVolume; //W

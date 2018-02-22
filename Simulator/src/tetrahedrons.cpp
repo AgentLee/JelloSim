@@ -10,7 +10,7 @@ Tetrahedrons::Tetrahedrons()
 
 void Tetrahedrons::computeRestDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices )
 {
-    Eigen::Matrix<uint, 4, 1> vertexIndices = particleIndices[tetraIndex];
+    Eigen::Matrix<uint, 1, 4> vertexIndices = particleIndices[tetraIndex];
     Eigen::Matrix<double, 3, 3> restDef;
 
     for(uint i=0; i<3; i++)
@@ -18,9 +18,9 @@ void Tetrahedrons::computeRestDeformation( uint tetraIndex, std::shared_ptr<Part
         //x1-x4  x2-x4  x3-x4
         //y1-y4  y2-y4  y3-y4
         //z1-z4  z2-z4  z3-z4
-        restDef(i,0) = vertices->pos[vertexIndices[0]][i] - vertices->pos[vertexIndices[3]][i];
-        restDef(i,1) = vertices->pos[vertexIndices[1]][i] - vertices->pos[vertexIndices[3]][i];
-        restDef(i,2) = vertices->pos[vertexIndices[2]][i] - vertices->pos[vertexIndices[3]][i];
+        restDef(i,0) = vertices->pos[vertexIndices(0, 0)][i] - vertices->pos[vertexIndices(0, 3)][i];
+        restDef(i,1) = vertices->pos[vertexIndices(0, 1)][i] - vertices->pos[vertexIndices(0, 3)][i];
+        restDef(i,2) = vertices->pos[vertexIndices(0, 2)][i] - vertices->pos[vertexIndices(0, 3)][i];
     }
 
     restDeformation[tetraIndex] = restDef;
@@ -38,7 +38,7 @@ void Tetrahedrons::computeUndeformedVolume( uint tetraIndex )
 
 Eigen::Matrix<T, 3, 3> Tetrahedrons::computeNewDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices )
 {
-    Eigen::Matrix<uint, 4, 1> vertexIndices = particleIndices[tetraIndex];
+    Eigen::Matrix<uint, 1, 4> vertexIndices = particleIndices[tetraIndex];
     Eigen::Matrix<T, 3, 3> newDef = Eigen::Matrix<T, 3, 3>::Zero();
 
     for(uint i=0; i<3; i++)
@@ -48,9 +48,9 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeNewDeformation( uint tetraIndex, std
             y1-y4  y2-y4  y3-y4
             z1-z4  z2-z4  z3-z4
         */
-        newDef(i,0) = vertices->pos[vertexIndices[0]][i] - vertices->pos[vertexIndices[3]][i];
-        newDef(i,1) = vertices->pos[vertexIndices[1]][i] - vertices->pos[vertexIndices[3]][i];
-        newDef(i,2) = vertices->pos[vertexIndices[2]][i] - vertices->pos[vertexIndices[3]][i];
+        newDef(i,0) = vertices->pos[vertexIndices(0, 0)][i] - vertices->pos[vertexIndices(0, 3)][i];
+        newDef(i,1) = vertices->pos[vertexIndices(0, 1)][i] - vertices->pos[vertexIndices(0, 3)][i];
+        newDef(i,2) = vertices->pos[vertexIndices(0, 2)][i] - vertices->pos[vertexIndices(0, 3)][i];
     }
 
     return newDef;
@@ -89,8 +89,8 @@ Eigen::Matrix<T, 3, 3> jInvTrMat(const Eigen::Matrix<T,3,3>& mat)
 
 Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Matrix<T,3,3>& F )
 {
-    float mu = 0.5;
-    float lamda = 0.5;
+    float mu = 50;
+    float lamda = 50;
 
     Eigen::JacobiSVD<Eigen::Matrix<T, 3, 3>> svd(F, Eigen::ComputeFullV | Eigen::ComputeFullU);
     Eigen::Matrix<T, 3, 3> U = svd.matrixU();
@@ -131,11 +131,11 @@ void Tetrahedrons::addForces( uint tetraIndex, std::shared_ptr<Particles> vertic
 {
     // Add forces to particles that make up the tetrahedron (f += h)
     // f4 += -(h1 + h2 + h3)
-    Eigen::Matrix<uint, 4, 1> vertexIndices = particleIndices[tetraIndex];
-    vertices->force[vertexIndices[0]] += H.col(0);
-    vertices->force[vertexIndices[1]] += H.col(1);
-    vertices->force[vertexIndices[2]] += H.col(2);
-    vertices->force[vertexIndices[3]] += -(H.col(0) + H.col(1) + H.col(2));
+    Eigen::Matrix<uint, 1, 4> vertexIndices = particleIndices[tetraIndex];
+    vertices->force[vertexIndices(0, 0)] += H.col(0);
+    vertices->force[vertexIndices(0, 1)] += H.col(1);
+    vertices->force[vertexIndices(0, 2)] += H.col(2);
+    vertices->force[vertexIndices(0, 3)] += -(H.col(0) + H.col(1) + H.col(2));
 }
 
 /*
@@ -161,7 +161,7 @@ void Tetrahedrons::tetgen_readLine(std::ifstream &fin, int nodesPerTet)
         //fin >> particleIndices[f-1](i, 0);
         float num;
         fin >> num;
-        particleIndices[f-1](i, 0) = num - 1;
+        particleIndices[f-1](0, i) = num - 1;
     }
 }
 

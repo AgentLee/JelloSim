@@ -29,7 +29,7 @@ void Sim::clean()
 	//Set forces for all vertices/particles to zero
 	for(int i=0; i<vertices->numParticles; i++)
 	{
-		vertices->force[i] = Eigen::Matrix<T, 3, 1>::Zero();
+		vertices->force[i] = Eigen::Matrix<T, 1, 3>::Zero();
 	}
 }
 
@@ -55,12 +55,12 @@ void Sim::computeElasticForces( int tetraIndex )
 void Sim::update(float dt)
 {
 	clean(); //clears forces
-	checkCollisions(); //Apply Forces to particles that occur through collision
+    checkCollisions(dt); //Apply Forces to particles that occur through collision
 
     // Gravity
     for(int i=0; i<vertices->numParticles; i++)
     {
-        vertices->force[i](1) -= .981; //computes and adds elastic forces to each particle
+        vertices->force[i](0,1) -= 9.81; //computes and adds elastic forces to each particle
     }
 
 	// Loop through tetras
@@ -72,7 +72,7 @@ void Sim::update(float dt)
     eulerIntegration(dt);
 }
 
-void Sim::checkCollisions()
+void Sim::checkCollisions(float dt)
 {
 	// TODO
 	// First do brute force SDF for primitives
@@ -86,28 +86,32 @@ void Sim::checkCollisions()
 
 	for(int i = 0; i< vertices->numParticles; ++i)
 	{
-		Eigen::Matrix<T, 3, 1> v(vertices->pos.at(i));
+		Eigen::Matrix<T, 1, 3> p(vertices->pos[i]);
 
 		// Transform the vertex to the plane's local space
 		// Assume the plane is at the origin
-		Eigen::Matrix<T, 4, 1> n = Eigen::Matrix<T, 4, 1>(0,1,0,0);
-		float sdf = SDF::sdPlane(v, n);
+		Eigen::Matrix<T, 1, 4> n = Eigen::Matrix<T, 1, 4>(0,1,0,0);
+		float sdf = SDF::sdPlane(p, n);
 
 		// Particle went through the surface
 		if(sdf < 0) {
 			if(SPRING_COLLISION) {
-				// Apply zero length spring
-				Eigen::Matrix<T, 3, 1> vSurf = v;
-				v[1] -= sdf;
-				
-				// WHERE IS k DEFINED
-				T k = (T)0;
-				vertices->force.at(i) += (-k * (v - vSurf));
+//				// Apply zero length spring
+//				Eigen::Matrix<T, 3, 1> vSurf = p;
+//				p[1] -= sdf;
+//
+//				// WHERE IS k DEFINED
+//				T k = (T)0;
+//				vertices->force.at(i) += (-k * (p - vSurf));
 			}
 			else {
 				// Move the particle up to the surface
 				// Subtract the y component by the SDF	
-				vertices->pos.at(i)[1] -= sdf;
+				vertices->pos[i](0, 1) = 0.00001;
+
+                float fy;
+                fy = vertices->mass[i] * vertices->vel[i](0, 1) / dt;
+                vertices->force[i](0, 1) -= fy/100.0;
 			}
 		}
 	}

@@ -17,9 +17,9 @@ class Particles
 public:
 	int numParticles;
 	std::vector<T> mass;
-	std::vector<Eigen::Matrix<T,3,1>> vel;
-	std::vector<Eigen::Matrix<T,3,1>> pos;
-	std::vector<Eigen::Matrix<T,3,1>> force;
+	std::vector<Eigen::Matrix<T,1,3>> vel;
+	std::vector<Eigen::Matrix<T,1,3>> pos;
+	std::vector<Eigen::Matrix<T,1,3>> force;
 
 	Particles(int n, T initialMass);
 	void initializeParticles_random();

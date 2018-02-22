@@ -30,5 +30,5 @@ public:
 	void computeElasticForces( int tetraIndex );
 	void eulerIntegration(float dt);
 	void update(float dt);
-	void checkCollisions();
+	void checkCollisions(float dt);
 };

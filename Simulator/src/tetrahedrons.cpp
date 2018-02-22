@@ -62,6 +62,31 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeF( uint tetraIndex, Eigen::Matrix<T,
     return F;
 }
 
+Eigen::Matrix<T, 3, 3> jInvTrMat(const Eigen::Matrix<T,3,3>& mat)
+{
+    float A, B, C, D, E, F, G, H, I;
+    float a, b, c, d, e, f, g, h, i;
+    a = mat(0,0), b = mat(1,0), c = mat(2,0),
+    d = mat(0,1), e = mat(1,1), f = mat(2,1),
+    g = mat(0,2), h = mat(1,2), i = mat(2,2);
+    A = e*i-f*h;
+    B = f*g-d*i;
+    C = d*h-e*g;
+    D = c*h-b*i;
+    E = a*i-c*g;
+    F = b*g-a*h;
+    G = b*f-c*e;
+    H = c*d-a*f;
+    I = a*e-b*d;
+
+    Eigen::Matrix<T, 3, 3> retMat;
+    retMat(0,0) = A, retMat(1,0) = B, retMat(2,0) = C,
+    retMat(0,1) = D, retMat(1,1) = E, retMat(2,1) = F,
+    retMat(0,2) = G, retMat(1,2) = H, retMat(2,2) = I;
+
+    return retMat;
+}
+
 Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Matrix<T,3,3>& F )
 {
     float mu = 0.5;
@@ -84,12 +109,12 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Mat
     // Eigen::Matrix<T,3,3> trTerm = R.transpose() * F - I;
     // P = 2.f * mu * (F - R) + lamda * trTerm.trace() * R;
 
-    Eigen::Matrix<T,3,3> J; // jacobian matrix // TODO - Compute J. Eigen doesn't do it??
-    double j = J.determinant();
+    float j = F.determinant();
     Eigen::Matrix<T,3,3> JFInvTr  = Eigen::Matrix<T, 3, 3>::Zero();
-    if (F.determinant() != 0) {
-        JFInvTr = j * F.inverse().transpose(); // TODO - Fix the singular matrix case.
-    }
+    JFInvTr = jInvTrMat(F);
+//    if (F.determinant() != 0) {
+//        JFInvTr = j * F.inverse().transpose();
+//    }
 
     Eigen::Matrix<T, 3, 3> P = Eigen::Matrix<T, 3, 3>::Zero();
     P = mu * (F - R) + lamda * (j - 1.f) * JFInvTr;

@@ -11,7 +11,7 @@ Tetrahedrons::Tetrahedrons()
 void Tetrahedrons::computeRestDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices )
 {
     Eigen::Matrix<uint, 4, 1> vertexIndices = particleIndices[tetraIndex];
-    Eigen::Matrix<T, 3, 3> restDef;
+    Eigen::Matrix<double, 3, 3> restDef;
 
     for(uint i=0; i<3; i++)
     {
@@ -158,7 +158,10 @@ void Tetrahedrons::tetgen_readLine(std::ifstream &fin, int nodesPerTet)
 
     for(int i = 0; i < nodesPerTet; ++i)
     {
-        fin >> particleIndices[f](i, 0);
+        //fin >> particleIndices[f-1](i, 0);
+        float num;
+        fin >> num;
+        particleIndices[f-1](i, 0) = num - 1;
     }
 }
 

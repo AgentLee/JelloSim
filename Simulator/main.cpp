@@ -19,6 +19,9 @@ constexpr int beginFrame = 2; //1 is initial state that is written separately
 constexpr int endFrame = 120;
 const std::string baseFileNamePoints = "TestPoints/testPointsFrame";
 
+const float timeStepsPerFrame = 10.0;
+const float frameRate = 24.0;
+
 int main(int argc, char* argv[])
 {
 	std::shared_ptr<Particles> vertices = std::make_shared<Particles>(0, 1.0f);
@@ -27,8 +30,17 @@ int main(int argc, char* argv[])
 
 	Utils::tetRead( vertices, triangles, tetras );
 
+    for(int i=0; i<vertices->numParticles; i++)
+    {
+        vertices->pos[i](1) += 5.0; //computes and adds elastic forces to each particle
+    }
+
 	//Create Bgeo file for first frame
-	Utils::writeBGEOforFrame( baseFileNamePoints, 1, vertices );
+	//Utils::writeBGEOforFrame( baseFileNamePoints, 1, vertices );
+	std::string pointsFile = baseFileNamePoints;
+	pointsFile += std::to_string(1);
+	pointsFile += ".bgeo";
+	Utils::writePartio<T, 3>(pointsFile, vertices, vertices->numParticles);
 
 	//Initialize Jello Sim
 	std::shared_ptr<Sim> sim = std::make_shared<Sim>( tetras, vertices );
@@ -37,11 +49,15 @@ int main(int argc, char* argv[])
 	//Main Loop of Jello Sim
 	for(int i=beginFrame; i<=endFrame; i++)
 	{
-		for(int j=0; j<=10; j++)
+		for(int j=0; j<=timeStepsPerFrame; j++)
 		{
-			sim->update();
+			sim->update(1 / frameRate / timeStepsPerFrame);
 		}
-		Utils::writeBGEOforFrame( baseFileNamePoints, i, vertices );
+		//Utils::writeBGEOforFrame( baseFileNamePoints, i, vertices );
+		std::string pointsFile = baseFileNamePoints;
+		pointsFile += std::to_string(i);
+		pointsFile += ".bgeo";
+		Utils::writePartio<T, 3>(pointsFile, vertices, vertices->numParticles);
 	}
 
 	return 0;

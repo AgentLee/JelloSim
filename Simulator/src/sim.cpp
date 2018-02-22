@@ -12,6 +12,10 @@ Sim::Sim(std::shared_ptr<Tetrahedrons> tetrahedronList, std::shared_ptr<Particle
 void Sim::init()
 {
 	// Precompute rest deformation (Dm), volume, inverse Dm for each tetrahedron
+	tetras->restDeformation.resize(tetras->numTetra);
+	tetras->restInverseDeformation.resize(tetras->numTetra);
+	tetras->undeformedVolume.resize(tetras->numTetra);
+
 	for(int i=0; i<tetras->numTetra; i++)
 	{
 		tetras->computeRestDeformation( i, vertices );
@@ -29,9 +33,13 @@ void Sim::clean()
 	}
 }
 
-void Sim::eulerIntegration()
+void Sim::eulerIntegration(float dt)
 {
-// TODO
+    for(int i=0; i<vertices->numParticles; i++)
+    {
+        vertices->updateParticleVelocity(dt);//eulerIntegration();
+        vertices->updateParticlePositions(dt);
+    }
 }
 
 void Sim::computeElasticForces( int tetraIndex )
@@ -44,10 +52,16 @@ void Sim::computeElasticForces( int tetraIndex )
 	tetras->addForces( tetraIndex, vertices, H );// Add energy to forces (f += h)
 }
 
-void Sim::update()
+void Sim::update(float dt)
 {
 	clean(); //clears forces
 	checkCollisions(); //Apply Forces to particles that occur through collision
+
+    // Gravity
+    for(int i=0; i<vertices->numParticles; i++)
+    {
+        vertices->force[i](1) -= .981; //computes and adds elastic forces to each particle
+    }
 
 	// Loop through tetras
 	for(int i=0; i<tetras->numTetra; i++)
@@ -55,10 +69,7 @@ void Sim::update()
 		computeElasticForces(i); //computes and adds elastic forces to each particle
 	}
 
-	for(int i=0; i<tetras->numTetra; i++)
-	{
-		eulerIntegration();
-	}
+    eulerIntegration(dt);
 }
 
 void Sim::checkCollisions()

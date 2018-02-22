@@ -103,16 +103,16 @@ namespace Utils
 		// can read more files for faces, edges, etc.
 
 		//read vertices
-		std::string fileName = "../Meshes/cube_poly_1/cube.1.node";
+		std::string fileName = "../Meshes/cube_poly_0.0625/cube.1.node";
 		vertices->tetgen_readNode( fileName );
 
 		//read faces and create obj file
-		std::string faceFile = "../Meshes/cube_poly_1/cube.1.face";
-		std::string objFileName = "../Meshes/cube_poly_1/cube.1.node";
+		std::string faceFile = "../Meshes/cube_poly_0.0625/cube.1.face";
+		std::string objFileName = "../Meshes/cube_poly_0.0625/cube1.obj";
 		Utils::generateTriObjFile( triangles, vertices, fileName, objFileName );
 
 		//read in tetrahedrons with particle indices
-		std::string eleFile = "../Meshes/cube_poly_1/cube.1.ele";
+		std::string eleFile = "../Meshes/cube_poly_0.0625/cube.1.ele";
 		tetras->tetgen_readEleFile(eleFile);
 	}
 

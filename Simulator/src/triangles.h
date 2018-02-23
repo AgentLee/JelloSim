@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "particles.h"
+
 class Triangles
 {
 public:

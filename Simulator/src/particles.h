@@ -11,6 +11,9 @@
 #include <time.h>
 
 using T = double;
+constexpr int dim = 3;
+const int num = 50;
+const double deltaT = 0.1;
 
 class Particles
 {
@@ -29,4 +32,6 @@ public:
 	// Reads Tetgen file and stores data
 	void tetgen_readLine(std::ifstream &fin, int numDims, int numAtt);
 	void tetgen_readNode(const std::string &inputFileName);
+
+	void writePartio(std::string particleFile);
 };

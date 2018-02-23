@@ -89,8 +89,13 @@ Eigen::Matrix<T, 3, 3> jInvTrMat(const Eigen::Matrix<T,3,3>& mat)
 
 Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Matrix<T,3,3>& F )
 {
-    float mu = 50;
-    float lamda = 50;
+    // These params should be calculated
+    // mu = k / (2 * (1 + poisson ratio))
+    // lambda = (k * poisson ratio) / ((1 + poisson ratio) (1 - 2 * poisson ratio))
+    float k = 1;
+    float poisson = 1;
+    float mu = k / (2 * (1 + poisson));
+    float lamda = (k * poisson) / ((1 + poisson) * (1 - 2 * poisson));
 
     Eigen::JacobiSVD<Eigen::Matrix<T, 3, 3>> svd(F, Eigen::ComputeFullV | Eigen::ComputeFullU);
     Eigen::Matrix<T, 3, 3> U = svd.matrixU();

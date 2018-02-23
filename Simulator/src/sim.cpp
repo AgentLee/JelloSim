@@ -112,6 +112,21 @@ void Sim::checkCollisions(float dt)
                 float fy;
                 fy = vertices->mass[i] * vertices->vel[i](0, 1) / dt;
                 vertices->force[i](0, 1) -= fy/100.0;
+
+				// for(int j = 0; j < vertices->numParticles; ++j) {
+				// 	vertices->pos[j](1) -= sdf;
+
+					// if(dot(surface normal, velocity) < 0)
+					// vertices->vel[j] = Eigen::Matrix<T, 1, 3>::Zero();
+					// vertices->vel[j] = -vertices->vel[j];
+				// }
+
+				// if(dot(surface normal, velocity) < 0)
+					// vertices->vel[j] = Eigen::Matrix<T, 1, 3>::Zero();
+
+				if(vertices->vel[i].dot(Eigen::Matrix<T, 1, 3>(0, 1, 0)) < 0) {
+					vertices->vel[i] = Eigen::Matrix<T, 1, 3>::Zero();
+				}
 			}
 		}
 	}

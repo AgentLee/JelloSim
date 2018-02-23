@@ -42,17 +42,22 @@ void Sim::eulerIntegration(float dt)
     }
 }
 
-void Sim::computeElasticForces( int tetraIndex )
+void Sim::computeElasticForces( int tetraIndex, int frame )
 {
 	Eigen::Matrix<T,3,3> newDeformation = tetras->computeNewDeformation( tetraIndex, vertices ); // Compute Ds, the new deformation
 	Eigen::Matrix<T,3,3> F 				= tetras->computeF( tetraIndex, newDeformation ); // Compute F = Ds(Dm_inv)
-	Eigen::Matrix<T,3,3> P 				= tetras->computeP( tetraIndex, F ); // Compute Piola (P)
+	Eigen::Matrix<T,3,3> P 				= tetras->computeP( tetraIndex, F, frame ); // Compute Piola (P)
 	Eigen::Matrix<T,3,3> H 				= tetras->computeH( tetraIndex, P, newDeformation ); // Compute Energy (H)
+
+	// if(frame == 4) {
+	// 	std::cout << F << std::endl;
+	// 	std::cout << "-------" << std::endl;
+	// }
 
 	tetras->addForces( tetraIndex, vertices, H );// Add energy to forces (f += h)
 }
 
-void Sim::update(float dt)
+void Sim::update(float dt, int frame)
 {
 	clean(); //clears forces
     checkCollisions(dt); //Apply Forces to particles that occur through collision
@@ -66,7 +71,7 @@ void Sim::update(float dt)
 	// Loop through tetras
 	for(int i=0; i<tetras->numTetra; i++)
 	{
-		computeElasticForces(i); //computes and adds elastic forces to each particle
+		computeElasticForces(i, frame); //computes and adds elastic forces to each particle
 	}
 
     eulerIntegration(dt);
@@ -107,22 +112,20 @@ void Sim::checkCollisions(float dt)
 			else {
 				// Move the particle up to the surface
 				// Subtract the y component by the SDF	
+				
 				vertices->pos[i](0, 1) = 0.00001;
-
+				
                 float fy;
                 fy = vertices->mass[i] * vertices->vel[i](0, 1) / dt;
                 vertices->force[i](0, 1) -= fy/100.0;
 
 				// for(int j = 0; j < vertices->numParticles; ++j) {
-				// 	vertices->pos[j](1) -= sdf;
+					// vertices->pos[j](1) -= sdf;
 
 					// if(dot(surface normal, velocity) < 0)
 					// vertices->vel[j] = Eigen::Matrix<T, 1, 3>::Zero();
 					// vertices->vel[j] = -vertices->vel[j];
 				// }
-
-				// if(dot(surface normal, velocity) < 0)
-					// vertices->vel[j] = Eigen::Matrix<T, 1, 3>::Zero();
 
 				if(vertices->vel[i].dot(Eigen::Matrix<T, 1, 3>(0, 1, 0)) < 0) {
 					vertices->vel[i] = Eigen::Matrix<T, 1, 3>::Zero();

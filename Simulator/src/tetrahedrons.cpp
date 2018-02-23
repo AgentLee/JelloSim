@@ -18,9 +18,9 @@ void Tetrahedrons::computeRestDeformation( uint tetraIndex, std::shared_ptr<Part
         //x1-x4  x2-x4  x3-x4
         //y1-y4  y2-y4  y3-y4
         //z1-z4  z2-z4  z3-z4
-        restDef(i,0) = vertices->pos[vertexIndices(0, 0)][i] - vertices->pos[vertexIndices(0, 3)][i];
-        restDef(i,1) = vertices->pos[vertexIndices(0, 1)][i] - vertices->pos[vertexIndices(0, 3)][i];
-        restDef(i,2) = vertices->pos[vertexIndices(0, 2)][i] - vertices->pos[vertexIndices(0, 3)][i];
+        restDef(i, 0) = vertices->pos[vertexIndices(0, 0)][i] - vertices->pos[vertexIndices(0, 3)][i];
+        restDef(i, 1) = vertices->pos[vertexIndices(0, 1)][i] - vertices->pos[vertexIndices(0, 3)][i];
+        restDef(i, 2) = vertices->pos[vertexIndices(0, 2)][i] - vertices->pos[vertexIndices(0, 3)][i];
     }
 
     restDeformation[tetraIndex] = restDef;
@@ -41,16 +41,16 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeNewDeformation( uint tetraIndex, std
     Eigen::Matrix<uint, 1, 4> vertexIndices = particleIndices[tetraIndex];
     Eigen::Matrix<T, 3, 3> newDef = Eigen::Matrix<T, 3, 3>::Zero();
 
-    for(uint i=0; i<3; i++)
+    for(uint i=0; i < 3; i++)
     {
         /*
             x1-x4  x2-x4  x3-x4
             y1-y4  y2-y4  y3-y4
             z1-z4  z2-z4  z3-z4
         */
-        newDef(i,0) = vertices->pos[vertexIndices(0, 0)][i] - vertices->pos[vertexIndices(0, 3)][i];
-        newDef(i,1) = vertices->pos[vertexIndices(0, 1)][i] - vertices->pos[vertexIndices(0, 3)][i];
-        newDef(i,2) = vertices->pos[vertexIndices(0, 2)][i] - vertices->pos[vertexIndices(0, 3)][i];
+        newDef(i, 0) = vertices->pos[vertexIndices(0, 0)][i] - vertices->pos[vertexIndices(0, 3)][i];
+        newDef(i, 1) = vertices->pos[vertexIndices(0, 1)][i] - vertices->pos[vertexIndices(0, 3)][i];
+        newDef(i, 2) = vertices->pos[vertexIndices(0, 2)][i] - vertices->pos[vertexIndices(0, 3)][i];
     }
 
     return newDef;
@@ -58,7 +58,18 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeNewDeformation( uint tetraIndex, std
 
 Eigen::Matrix<T, 3, 3> Tetrahedrons::computeF( uint tetraIndex, Eigen::Matrix<T,3,3>& Ds )
 {
-    Eigen::Matrix<T, 3, 3> F = Ds*restDeformation[tetraIndex];
+    Eigen::Matrix<T, 3, 3> F = Ds * restInverseDeformation[tetraIndex];
+
+    // HACK to prevent FPN error from building up 
+    for(int j = 0; j < 3; ++j) {
+        for(int i = 0; i < 3; ++i) {
+            if(F(i,j) < 1e-10) {
+                F(i, j) = 0;
+            } 
+        }
+    }
+    // Eigen::Matrix<T, 3, 3> F = Ds * restDeformation[tetraIndex];
+
     return F;
 }
 
@@ -87,15 +98,18 @@ Eigen::Matrix<T, 3, 3> jInvTrMat(const Eigen::Matrix<T,3,3>& mat)
     return retMat;
 }
 
-Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Matrix<T,3,3>& F )
+Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Matrix<T,3,3>& F, int frame )
 {
     // These params should be calculated
     // mu = k / (2 * (1 + poisson ratio))
     // lambda = (k * poisson ratio) / ((1 + poisson ratio) (1 - 2 * poisson ratio))
-    float k = 1;
-    float poisson = 1;
-    float mu = k / (2 * (1 + poisson));
-    float lamda = (k * poisson) / ((1 + poisson) * (1 - 2 * poisson));
+    float youngsMod = 1000;
+    float poisson = 0.2;   // Always less than 0.5. (goes to infinity)
+    float mu = youngsMod / (2 * (1 + poisson));
+    float lamda = (youngsMod * poisson) / ((1 + poisson) * (1 - 2 * poisson));
+
+    // mu = 0;
+    // lamda = 0;
 
     Eigen::JacobiSVD<Eigen::Matrix<T, 3, 3>> svd(F, Eigen::ComputeFullV | Eigen::ComputeFullU);
     Eigen::Matrix<T, 3, 3> U = svd.matrixU();
@@ -108,6 +122,14 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Mat
     }
 
     Eigen::Matrix<T,3,3> R = U * V.transpose();
+
+    if(frame == 2 && tetraIndex < 5) {
+        std::cout << "F" << tetraIndex << ": " << std::endl;
+        std::cout << F << std::endl;
+        std::cout << "R: " << std::endl;
+        std::cout << R << std::endl;
+        std::cout << "------" << std::endl;
+    }
 
     // USE BELOW LINES OF CODE TO USE LINEAR COROTATED METHOD
     // Eigen::Matrix<T,3,3> I = Eigen::Matrix<T, 3, 3>::Identity();
@@ -128,7 +150,9 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Mat
 
 Eigen::Matrix<T, 3, 3> Tetrahedrons::computeH( uint tetraIndex, Eigen::Matrix<T,3,3>& P, Eigen::Matrix<T,3,3>& Ds )
 {
-    Eigen::Matrix<T, 3, 3> H = -(undeformedVolume[tetraIndex] * P * Ds.transpose());
+    // Eigen::Matrix<T, 3, 3> H = -(undeformedVolume[tetraIndex] * P * Ds.transpose());
+    Eigen::Matrix<T, 3, 3> H = -(undeformedVolume[tetraIndex] * P * restInverseDeformation[tetraIndex].transpose());
+
     return H;
 }
 

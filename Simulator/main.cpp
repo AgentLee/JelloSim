@@ -24,7 +24,7 @@ const float frameRate = 24.0;
 
 int main(int argc, char* argv[])
 {
-	std::shared_ptr<Particles> vertices = std::make_shared<Particles>(0, 1.0f);
+	std::shared_ptr<Particles> vertices = std::make_shared<Particles>(0, 0.1f);
 	std::shared_ptr<Triangles> triangles = std::make_shared<Triangles>();
 	std::shared_ptr<Tetrahedrons> tetras = std::make_shared<Tetrahedrons>();
 
@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 	{
 		for(int j=0; j<=timeStepsPerFrame; j++)
 		{
-			sim->update(1 / frameRate / timeStepsPerFrame / 100.0);
+			sim->update(1 / frameRate / timeStepsPerFrame / 100.0, i);
 		}
 		//Utils::writeBGEOforFrame( baseFileNamePoints, i, vertices );
 		std::string pointsFile = baseFileNamePoints;

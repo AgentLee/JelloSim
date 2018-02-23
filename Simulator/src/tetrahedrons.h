@@ -37,7 +37,7 @@ public:
     // Main Update Loop
     Eigen::Matrix<T,3,3> computeNewDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices ); // Calculate new deformation
     Eigen::Matrix<T,3,3> computeF( uint tetraIndex, Eigen::Matrix<T,3,3>& Ds ); // Calculate F
-    Eigen::Matrix<T,3,3> computeP( uint tetraIndex, const Eigen::Matrix<T,3,3>& F ); // Calculate P
+    Eigen::Matrix<T,3,3> computeP( uint tetraIndex, const Eigen::Matrix<T,3,3>& F, int frame ); // Calculate P
     Eigen::Matrix<T,3,3> computeH( uint tetraIndex, Eigen::Matrix<T,3,3>& P, Eigen::Matrix<T,3,3>& Ds ); // Calculate H
 
     //Add a force to every particle that comprises the tetrahedron

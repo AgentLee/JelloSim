@@ -90,9 +90,21 @@ namespace Utils
 
 	void inline generateTriObjFile( std::shared_ptr<Triangles> triangles,  std::shared_ptr<Particles> particles, const std::string& fileName, const std::string& objFileName )
 	{
+		// ifstream myfile(fileName);
+
+		// std::string line;
+		// while(std::getline(myfile, line)) {
+		// 	std::cout << line << std::endl;
+		// }
+
 		//generate obj file
 		triangles->tetgen_readFace(fileName);
 		Utils::create_objFile(objFileName, particles, triangles);
+
+		// for(int i = 0; i < triangles->numTriangles; ++i) {
+		// 	std::cout << (i + 1) << ". " << triangles->triFaceList.at(i) << std::endl;
+		// 	std::cout << "----------" << std::endl;
+		// }
 	}
 
 	// Reads all the required files and stores stuff in respective arrays
@@ -106,10 +118,17 @@ namespace Utils
 		std::string fileName = "../Meshes/cube_poly_0.0625/cube.1.node";
 		vertices->tetgen_readNode( fileName );
 
+		// for(int i = 0; i < vertices->numParticles; ++i) {
+		// 	std::cout << (i + 1) << vertices->pos.at(i) << std::endl;
+		// 	std::cout << "----------" << std::endl;
+		// }
+
 		//read faces and create obj file
 		std::string faceFile = "../Meshes/cube_poly_0.0625/cube.1.face";
-		std::string objFileName = "../Meshes/cube_poly_0.0625/cube1.obj";
-		Utils::generateTriObjFile( triangles, vertices, fileName, objFileName );
+		std::string objFileName = "../OBJs/cube1.obj";
+		Utils::generateTriObjFile( triangles, vertices, faceFile, objFileName );
+
+
 
 		//read in tetrahedrons with particle indices
 		std::string eleFile = "../Meshes/cube_poly_0.0625/cube.1.ele";

@@ -27,11 +27,13 @@ public:
 
 	void init();
 	void clean();
-	void computeElasticForces( int tetraIndex, int frame );
+	void computeElasticForces( int tetraIndex, int frame, bool &collided );
 	void eulerIntegration(float dt);
-	void update(float dt, int frame);
-	void checkCollisions(float dt);
+	void update(float dt, int frame, bool &collided);
+	void checkCollisions(float dt, bool &collided);
 	void writeFile(std::string triangleFile);
 
 	void simulate();
+
+	// bool collided = false;
 };

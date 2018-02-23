@@ -42,11 +42,11 @@ void Sim::eulerIntegration(float dt)
     }
 }
 
-void Sim::computeElasticForces( int tetraIndex, int frame )
+void Sim::computeElasticForces( int tetraIndex, int frame, bool &collided )
 {
 	Eigen::Matrix<T,3,3> newDeformation = tetras->computeNewDeformation( tetraIndex, vertices ); // Compute Ds, the new deformation
 	Eigen::Matrix<T,3,3> F 				= tetras->computeF( tetraIndex, newDeformation ); // Compute F = Ds(Dm_inv)
-	Eigen::Matrix<T,3,3> P 				= tetras->computeP( tetraIndex, F, frame ); // Compute Piola (P)
+	Eigen::Matrix<T,3,3> P 				= tetras->computeP( tetraIndex, F, frame, collided ); // Compute Piola (P)
 	Eigen::Matrix<T,3,3> H 				= tetras->computeH( tetraIndex, P, newDeformation ); // Compute Energy (H)
 
 	// if(frame == 4) {
@@ -57,10 +57,10 @@ void Sim::computeElasticForces( int tetraIndex, int frame )
 	tetras->addForces( tetraIndex, vertices, H );// Add energy to forces (f += h)
 }
 
-void Sim::update(float dt, int frame)
+void Sim::update(float dt, int frame, bool &collided)
 {
 	clean(); //clears forces
-    checkCollisions(dt); //Apply Forces to particles that occur through collision
+    checkCollisions(dt, collided); //Apply Forces to particles that occur through collision
 
     // Gravity
     for(int i=0; i<vertices->numParticles; i++)
@@ -71,13 +71,13 @@ void Sim::update(float dt, int frame)
 	// Loop through tetras
 	for(int i=0; i<tetras->numTetra; i++)
 	{
-		computeElasticForces(i, frame); //computes and adds elastic forces to each particle
+		computeElasticForces(i, frame, collided); //computes and adds elastic forces to each particle
 	}
 
     eulerIntegration(dt);
 }
 
-void Sim::checkCollisions(float dt)
+void Sim::checkCollisions(float dt, bool &collided)
 {
 	// TODO
 	// First do brute force SDF for primitives
@@ -100,6 +100,8 @@ void Sim::checkCollisions(float dt)
 
 		// Particle went through the surface
 		if(sdf < 0) {
+			collided = true;
+
 			if(SPRING_COLLISION) {
 //				// Apply zero length spring
 //				Eigen::Matrix<T, 3, 1> vSurf = p;
@@ -139,26 +141,26 @@ void Sim::checkCollisions(float dt)
 /* 
  *  Write obj file
  */
-void Sim::writeFile(std::string triangleFile) {
-    std::ofstream myfile;
-    myfile.open(triangleFile);
+// void Sim::writeFile(std::string triangleFile) {
+//     std::ofstream myfile;
+//     myfile.open(triangleFile);
 
-    for (int i = 0; i < vertices->numParticles; i++) {
-        myfile << "v " << vertices->pos[i][0] << " " << vertices->pos[i][1] << " " << vertices->pos[i][2] << "\n";
-    }
+//     for (int i = 0; i < vertices->numParticles; i++) {
+//         myfile << "v " << vertices->pos[i][0] << " " << vertices->pos[i][1] << " " << vertices->pos[i][2] << "\n";
+//     }
 
-    for (int i = 0; i < tetras->numTetra; i++) {
-        myfile << "f " << tetras->particleIndices[i][0] << " " << tetras->particleIndices[i][1] << " " << tetras->particleIndices[i][2] << "\n";
-    }
+//     for (int i = 0; i < tetras->numTetra; i++) {
+//         myfile << "f " << tetras->particleIndices[i][0] << " " << tetras->particleIndices[i][1] << " " << tetras->particleIndices[i][2] << "\n";
+//     }
 
-    myfile.close();
-}
+//     myfile.close();
+// }
 
 
-void Sim::simulate() {
-	for (int frame = 1; frame <= 120; frame++) {
-		update(0.1, frame);
-        writeFile("jelly" + std::to_string(frame) + ".obj");
-    }
-}
+// void Sim::simulate() {
+// 	for (int frame = 1; frame <= 120; frame++) {
+// 		// update(0.1, frame, false);
+//         writeFile("jelly" + std::to_string(frame) + ".obj");
+//     }
+// }
 

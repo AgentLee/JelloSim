@@ -98,7 +98,7 @@ Eigen::Matrix<T, 3, 3> jInvTrMat(const Eigen::Matrix<T,3,3>& mat)
     return retMat;
 }
 
-Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Matrix<T,3,3>& F, int frame )
+Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Matrix<T,3,3>& F, int frame, bool &collided )
 {
     // These params should be calculated
     // mu = k / (2 * (1 + poisson ratio))
@@ -123,13 +123,13 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Mat
 
     Eigen::Matrix<T,3,3> R = U * V.transpose();
 
-    if(frame == 2 && tetraIndex < 5) {
-        std::cout << "F" << tetraIndex << ": " << std::endl;
-        std::cout << F << std::endl;
-        std::cout << "R: " << std::endl;
-        std::cout << R << std::endl;
-        std::cout << "------" << std::endl;
-    }
+    // if(frame < 45 && collided) {
+    //     std::cout << "F" << tetraIndex << ": " << std::endl;
+    //     std::cout << F << std::endl;
+    //     std::cout << "R: " << std::endl;
+    //     std::cout << R << std::endl;
+    //     std::cout << "------" << std::endl;
+    // }
 
     // USE BELOW LINES OF CODE TO USE LINEAR COROTATED METHOD
     // Eigen::Matrix<T,3,3> I = Eigen::Matrix<T, 3, 3>::Identity();

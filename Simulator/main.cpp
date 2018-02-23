@@ -19,11 +19,13 @@ constexpr int beginFrame = 2; //1 is initial state that is written separately
 constexpr int endFrame = 120;
 const std::string baseFileNamePoints = "TestPoints/testPointsFrame";
 
-const float timeStepsPerFrame = 1.0;
-const float frameRate = 24.0;
+// const float timeStepsPerFrame = 1.0;
+// const float frameRate = 24.0;
 
 int main(int argc, char* argv[])
 {
+	std::cout << "BEGIN SIM" << std::endl;
+
 	std::shared_ptr<Particles> vertices = std::make_shared<Particles>(0, 0.1f);
 	std::shared_ptr<Triangles> triangles = std::make_shared<Triangles>();
 	std::shared_ptr<Tetrahedrons> tetras = std::make_shared<Tetrahedrons>();
@@ -32,7 +34,7 @@ int main(int argc, char* argv[])
 
     for(int i=0; i<vertices->numParticles; i++)
     {
-        vertices->pos[i](1) += 5.0; //computes and adds elastic forces to each particle
+        vertices->pos[i](1) += .5; //computes and adds elastic forces to each particle
     }
 
 	//Create Bgeo file for first frame
@@ -46,19 +48,27 @@ int main(int argc, char* argv[])
 	std::shared_ptr<Sim> sim = std::make_shared<Sim>( tetras, vertices );
 	sim->init();
 
+	bool collided = false;
+
 	//Main Loop of Jello Sim
 	for(int i=beginFrame; i<=endFrame; i++)
 	{
-		for(int j=0; j<=timeStepsPerFrame; j++)
+		for(int j=0; j<=10; j++)
 		{
-			sim->update(1 / frameRate / timeStepsPerFrame / 100.0, i);
+			// sim->update(1 / frameRate / timeStepsPerFrame / 100.0, i);
+			sim->update(0.00001, i, collided);
 		}
+
+		// sim->update(0.0001, i);
+
 		//Utils::writeBGEOforFrame( baseFileNamePoints, i, vertices );
 		std::string pointsFile = baseFileNamePoints;
 		pointsFile += std::to_string(i);
 		pointsFile += ".bgeo";
 		Utils::writePartio<T, 3>(pointsFile, vertices, vertices->numParticles);
 	}
+
+	std::cout << "END SIM" << std::endl;
 
 	return 0;
 }

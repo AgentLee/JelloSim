@@ -15,12 +15,14 @@ void Triangles::tetgen_readLine(std::ifstream &fin)
     float f;
     fin >> f; // first one is id.. //next 3 are the actual indices of the vertices // last one is the boundary marker
 
-    for(int i = 0; i < 3; ++i)
-    {
-        int j, k, l;
-        fin >> j >> k >> l;
-        addTriangle( j, k, l);
-    }
+    int j, k, l;
+    fin >> j >> k >> l;
+
+    // std::cout << "J: " << j << " K: " << k << " L:" << l << std::endl;
+
+    addTriangle(j - 1, k - 1, l - 1);
+
+    fin >> f;
 }
 
 void Triangles::tetgen_readFace(const std::string &inputFileName)

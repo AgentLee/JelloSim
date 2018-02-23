@@ -131,3 +131,31 @@ void Sim::checkCollisions(float dt)
 		}
 	}
 }
+
+
+/* 
+ *  Write obj file
+ */
+void Sim::writeFile(std::string triangleFile) {
+    std::ofstream myfile;
+    myfile.open(triangleFile);
+
+    for (int i = 0; i < vertices->numParticles; i++) {
+        myfile << "v " << vertices->pos[i][0] << " " << vertices->pos[i][1] << " " << vertices->pos[i][2] << "\n";
+    }
+
+    for (int i = 0; i < tetras->numTetra; i++) {
+        myfile << "f " << tetras->particleIndices[i][0] << " " << tetras->particleIndices[i][1] << " " << tetras->particleIndices[i][2] << "\n";
+    }
+
+    myfile.close();
+}
+
+
+void Sim::simulate() {
+	for (int frame = 1; frame <= 120; frame++) {
+		update(0.1);
+        writeFile("jelly" + std::to_string(frame) + ".obj");
+    }
+}
+

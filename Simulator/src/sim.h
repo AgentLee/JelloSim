@@ -31,4 +31,7 @@ public:
 	void eulerIntegration(float dt);
 	void update(float dt);
 	void checkCollisions(float dt);
+	void writeFile(std::string triangleFile);
+
+	void simulate();
 };

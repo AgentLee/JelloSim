@@ -157,7 +157,7 @@ void Sim::writeFile(std::string triangleFile) {
 
 void Sim::simulate() {
 	for (int frame = 1; frame <= 120; frame++) {
-		update(0.1);
+		update(0.1, frame);
         writeFile("jelly" + std::to_string(frame) + ".obj");
     }
 }

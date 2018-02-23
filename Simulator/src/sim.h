@@ -29,7 +29,7 @@ public:
 	void clean();
 	void computeElasticForces( int tetraIndex, int frame );
 	void eulerIntegration(float dt);
-	void update(float dt, int i);
+	void update(float dt, int frame);
 	void checkCollisions(float dt);
 	void writeFile(std::string triangleFile);
 

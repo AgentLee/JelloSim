@@ -17,9 +17,6 @@ void Triangles::tetgen_readLine(std::ifstream &fin)
 
     int j, k, l;
     fin >> j >> k >> l;
-
-    // std::cout << "J: " << j << " K: " << k << " L:" << l << std::endl;
-
     addTriangle(j - 1, k - 1, l - 1);
 
     fin >> f;

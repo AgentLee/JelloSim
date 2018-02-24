@@ -34,6 +34,4 @@ public:
 	void writeFile(std::string triangleFile);
 
 	void simulate();
-
-	// bool collided = false;
 };

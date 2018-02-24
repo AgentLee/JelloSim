@@ -17,10 +17,13 @@ using T = double;
 
 constexpr int beginFrame = 2; //1 is initial state that is written separately
 constexpr int endFrame = 120;
-const std::string baseFileNamePoints = "TestPoints/testPointsFrame";
+constexpr int numSimulationStepsPerFrame = 10;
 
-// const float timeStepsPerFrame = 1.0;
-// const float frameRate = 24.0;
+const std::string nodeFile = "../Assets/Meshes/cube_poly_0.001/cube.1.node";
+const std::string faceFile = "../Assets/Meshes/cube_poly_0.001/cube.1.face";
+const std::string eleFile  = "../Assets/Meshes/cube_poly_0.001/cube.1.ele";
+const std::string objFile  = "../Assets/OBJs/cube1.obj";
+const std::string baseFileNamePoints = "../Assets/BGEOs/jelloTestFrame";
 
 int main(int argc, char* argv[])
 {
@@ -30,7 +33,7 @@ int main(int argc, char* argv[])
 	std::shared_ptr<Triangles> triangles = std::make_shared<Triangles>();
 	std::shared_ptr<Tetrahedrons> tetras = std::make_shared<Tetrahedrons>();
 
-	Utils::tetRead( vertices, triangles, tetras );
+	Utils::tetRead( vertices, triangles, tetras, nodeFile, faceFile, eleFile, objFile );
 
     for(int i=0; i<vertices->numParticles; i++)
     {
@@ -38,11 +41,7 @@ int main(int argc, char* argv[])
     }
 
 	//Create Bgeo file for first frame
-	//Utils::writeBGEOforFrame( baseFileNamePoints, 1, vertices );
-	std::string pointsFile = baseFileNamePoints;
-	pointsFile += std::to_string(1);
-	pointsFile += ".bgeo";
-	Utils::writePartio<T, 3>(pointsFile, vertices, vertices->numParticles);
+	Utils::writeBGEOforFrame( baseFileNamePoints, 1, vertices );
 
 	//Initialize Jello Sim
 	std::shared_ptr<Sim> sim = std::make_shared<Sim>( tetras, vertices );
@@ -53,22 +52,14 @@ int main(int argc, char* argv[])
 	//Main Loop of Jello Sim
 	for(int i=beginFrame; i<=endFrame; i++)
 	{
-		for(int j=0; j<=10; j++)
+		for(int j=0; j<=numSimulationStepsPerFrame; j++)
 		{
-			// sim->update(1 / frameRate / timeStepsPerFrame / 100.0, i);
 			sim->update(0.00001, i, collided);
 		}
 
-		// sim->update(0.0001, i);
-
-		//Utils::writeBGEOforFrame( baseFileNamePoints, i, vertices );
-		std::string pointsFile = baseFileNamePoints;
-		pointsFile += std::to_string(i);
-		pointsFile += ".bgeo";
-		Utils::writePartio<T, 3>(pointsFile, vertices, vertices->numParticles);
+		Utils::writeBGEOforFrame( baseFileNamePoints, i, vertices );
 	}
 
 	std::cout << "END SIM" << std::endl;
-
 	return 0;
 }

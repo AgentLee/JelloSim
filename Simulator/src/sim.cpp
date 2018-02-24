@@ -37,7 +37,7 @@ void Sim::eulerIntegration(float dt)
 {
     for(int i=0; i<vertices->numParticles; i++)
     {
-        vertices->updateParticleVelocity(dt);//eulerIntegration();
+        vertices->updateParticleVelocity(dt);
         vertices->updateParticlePositions(dt);
     }
 }
@@ -49,11 +49,6 @@ void Sim::computeElasticForces( int tetraIndex, int frame, bool &collided )
 	Eigen::Matrix<T,3,3> P 				= tetras->computeP( tetraIndex, F, frame, collided ); // Compute Piola (P)
 	Eigen::Matrix<T,3,3> H 				= tetras->computeH( tetraIndex, P, newDeformation ); // Compute Energy (H)
 
-	// if(frame == 4) {
-	// 	std::cout << F << std::endl;
-	// 	std::cout << "-------" << std::endl;
-	// }
-
 	tetras->addForces( tetraIndex, vertices, H );// Add energy to forces (f += h)
 }
 
@@ -62,7 +57,7 @@ void Sim::update(float dt, int frame, bool &collided)
 	clean(); //clears forces
     checkCollisions(dt, collided); //Apply Forces to particles that occur through collision
 
-    // Gravity
+    // External forces like gravity
     for(int i=0; i<vertices->numParticles; i++)
     {
         vertices->force[i](0,1) -= 9.81; //computes and adds elastic forces to each particle
@@ -79,7 +74,6 @@ void Sim::update(float dt, int frame, bool &collided)
 
 void Sim::checkCollisions(float dt, bool &collided)
 {
-	// TODO
 	// First do brute force SDF for primitives
 	// https://gamedev.stackexchange.com/questions/66636/what-are-distance-fields-and-how-are-they-applicable-to-collision-detection
 	// Transform the particles to the static mesh's local space

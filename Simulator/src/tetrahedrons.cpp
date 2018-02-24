@@ -4,9 +4,7 @@
 #define oneSixth 0.166666666667
 
 Tetrahedrons::Tetrahedrons()
-{
-    // TODO
-}
+{}
 
 void Tetrahedrons::computeRestDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices )
 {
@@ -68,7 +66,6 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeF( uint tetraIndex, Eigen::Matrix<T,
             } 
         }
     }
-    // Eigen::Matrix<T, 3, 3> F = Ds * restDeformation[tetraIndex];
 
     return F;
 }
@@ -100,16 +97,12 @@ Eigen::Matrix<T, 3, 3> jInvTrMat(const Eigen::Matrix<T,3,3>& mat)
 
 Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Matrix<T,3,3>& F, int frame, bool &collided )
 {
-    // These params should be calculated
     // mu = k / (2 * (1 + poisson ratio))
     // lambda = (k * poisson ratio) / ((1 + poisson ratio) (1 - 2 * poisson ratio))
-    float youngsMod = 1000;
-    float poisson = 0.2;   // Always less than 0.5. (goes to infinity)
+    float youngsMod = 0.001;
+    float poisson = 0.2;   // Make sure this is always less than 0.5 otherwise values go to infinity
     float mu = youngsMod / (2 * (1 + poisson));
     float lamda = (youngsMod * poisson) / ((1 + poisson) * (1 - 2 * poisson));
-
-    // mu = 0;
-    // lamda = 0;
 
     Eigen::JacobiSVD<Eigen::Matrix<T, 3, 3>> svd(F, Eigen::ComputeFullV | Eigen::ComputeFullU);
     Eigen::Matrix<T, 3, 3> U = svd.matrixU();
@@ -150,9 +143,7 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Mat
 
 Eigen::Matrix<T, 3, 3> Tetrahedrons::computeH( uint tetraIndex, Eigen::Matrix<T,3,3>& P, Eigen::Matrix<T,3,3>& Ds )
 {
-    // Eigen::Matrix<T, 3, 3> H = -(undeformedVolume[tetraIndex] * P * Ds.transpose());
     Eigen::Matrix<T, 3, 3> H = -(undeformedVolume[tetraIndex] * P * restInverseDeformation[tetraIndex].transpose());
-
     return H;
 }
 
@@ -187,7 +178,6 @@ void Tetrahedrons::tetgen_readLine(std::ifstream &fin, int nodesPerTet)
 
     for(int i = 0; i < nodesPerTet; ++i)
     {
-        //fin >> particleIndices[f-1](i, 0);
         float num;
         fin >> num;
         particleIndices[f-1](0, i) = num - 1;
@@ -196,7 +186,6 @@ void Tetrahedrons::tetgen_readLine(std::ifstream &fin, int nodesPerTet)
 
 void Tetrahedrons::tetgen_readEleFile(const std::string &inputFileName)
 {
-    // TODO
     std::ifstream fin(inputFileName);
 
     if(fin.is_open())

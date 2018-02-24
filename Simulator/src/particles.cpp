@@ -72,7 +72,6 @@ void Particles::tetgen_readLine(std::ifstream &fin, int numDims, int numAtt)
     {
         fin >> pos[f-1](0,i);
     }
-    // std::cout << pos[f-1](0, 0) << " " << pos[f-1](1, 0) << " " << pos[f-1](2, 0) << "\n";
 
     for(int i = 0; i < numAtt; ++i)
     {
@@ -83,7 +82,6 @@ void Particles::tetgen_readLine(std::ifstream &fin, int numDims, int numAtt)
 
 void Particles::tetgen_readNode(const std::string &inputFileName)
 {
-    // TODO
     std::ifstream fin(inputFileName);
 
     if(fin.is_open())
@@ -109,26 +107,4 @@ void Particles::tetgen_readNode(const std::string &inputFileName)
 
         fin.close();
     }
-}
-
-void Particles::writePartio(std::string particleFile) {
-    Partio::ParticlesDataMutable* parts = Partio::create();
-    Partio::ParticleAttribute posH, vH, mH;
-    mH = parts->addAttribute("m", Partio::VECTOR, 1);
-    posH = parts->addAttribute("position", Partio::VECTOR, 3);
-    vH = parts->addAttribute("v", Partio::VECTOR, 3);
-    for (int i = 0; i < num; i++){
-        int idx = parts->addParticle();
-        float* m = parts->dataWrite<float>(mH, idx);
-        float* p = parts->dataWrite<float>(posH, idx);
-        float* v = parts->dataWrite<float>(vH, idx);
-        m[0] = (T)mass[i];
-        for (int k = 0; k < 3; k++)
-            p[k] = (T)pos[i][k];
-        for (int k = 0; k < 3; k++)
-            v[k] = (T)vel[i][k];
-    }
-
-    Partio::write(particleFile.c_str(), *parts);
-    parts->release();
 }

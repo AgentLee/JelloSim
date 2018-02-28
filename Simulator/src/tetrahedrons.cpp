@@ -61,7 +61,7 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeF( uint tetraIndex, Eigen::Matrix<T,
     // HACK to prevent FPN error from building up 
     for(int j = 0; j < 3; ++j) {
         for(int i = 0; i < 3; ++i) {
-            if(F(i,j) < 1e-10) {
+            if(std::abs(F(i,j)) < 1e-10) {
                 F(i, j) = 0;
             } 
         }
@@ -99,8 +99,8 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Mat
 {
     // mu = k / (2 * (1 + poisson ratio))
     // lambda = (k * poisson ratio) / ((1 + poisson ratio) (1 - 2 * poisson ratio))
-    float youngsMod = 0.001;
-    float poisson = 0.2;   // Make sure this is always less than 0.5 otherwise values go to infinity
+    float youngsMod = 500000;
+    float poisson = 0.3;   // Make sure this is always less than 0.5 otherwise values go to infinity
     float mu = youngsMod / (2 * (1 + poisson));
     float lamda = (youngsMod * poisson) / ((1 + poisson) * (1 - 2 * poisson));
 
@@ -108,10 +108,10 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Mat
     Eigen::Matrix<T, 3, 3> U = svd.matrixU();
     Eigen::Matrix<T, 3, 3> V = svd.matrixV();
     if (U.determinant() < 0.f) {
-        U(2) *= -1;
+        U.col(2) *= -1;
     }
     if (V.determinant() < 0.f) {
-        V(2) *= -1;
+        V.col(2) *= -1;
     }
 
     Eigen::Matrix<T,3,3> R = U * V.transpose();
@@ -137,7 +137,7 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Mat
 //    }
 
     Eigen::Matrix<T, 3, 3> P = Eigen::Matrix<T, 3, 3>::Zero();
-    P = mu * (F - R) + lamda * (j - 1.f) * JFInvTr;
+    P = 2* mu * (F - R) + lamda * (j - 1.f) * JFInvTr;
     return P;
 }
 

@@ -16,8 +16,9 @@
 using T = double;
 
 constexpr int beginFrame = 2; //1 is initial state that is written separately
-constexpr int endFrame = 120;
-constexpr int numSimulationStepsPerFrame = 10;
+constexpr int endFrame = 70;
+constexpr int numSimulationStepsPerFrame = 400;
+constexpr float dt = 1e-4;
 
 const std::string nodeFile = "../Assets/Meshes/cube_poly_0.001/cube.1.node";
 const std::string faceFile = "../Assets/Meshes/cube_poly_0.001/cube.1.face";
@@ -54,9 +55,10 @@ int main(int argc, char* argv[])
 	{
 		for(int j=0; j<=numSimulationStepsPerFrame; j++)
 		{
-			sim->update(0.00001, i, collided);
+			sim->update(dt, i, collided);
 		}
 
+		std::cout << "Frame: " << i << std::endl;
 		Utils::writeBGEOforFrame( baseFileNamePoints, i, vertices );
 	}
 

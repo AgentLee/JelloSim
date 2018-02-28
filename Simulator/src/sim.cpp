@@ -34,12 +34,9 @@ void Sim::clean()
 }
 
 void Sim::eulerIntegration(float dt)
-{
-    for(int i=0; i<vertices->numParticles; i++)
-    {
-        vertices->updateParticleVelocity(dt);
-        vertices->updateParticlePositions(dt);
-    }
+{        
+	vertices->updateParticleVelocity(dt);
+    vertices->updateParticlePositions(dt);
 }
 
 void Sim::computeElasticForces( int tetraIndex, int frame, bool &collided )
@@ -60,7 +57,7 @@ void Sim::update(float dt, int frame, bool &collided)
     // External forces like gravity
     for(int i=0; i<vertices->numParticles; i++)
     {
-        vertices->force[i](0,1) -= 9.81; //computes and adds elastic forces to each particle
+        vertices->force[i](0,1) -= 9.81 * vertices->mass[i];//*m //computes and adds elastic forces to each particle
     }
 
 	// Loop through tetras
@@ -82,7 +79,6 @@ void Sim::checkCollisions(float dt, bool &collided)
 	// If zero, particle on the surface.
 
 	// Later do interobject collisions with a grid+bounding box or BVH
-
 	for(int i = 0; i< vertices->numParticles; ++i)
 	{
 		Eigen::Matrix<T, 1, 3> p(vertices->pos[i]);
@@ -97,31 +93,19 @@ void Sim::checkCollisions(float dt, bool &collided)
 			collided = true;
 
 			if(SPRING_COLLISION) {
-//				// Apply zero length spring
-//				Eigen::Matrix<T, 3, 1> vSurf = p;
-//				p[1] -= sdf;
-//
-//				// WHERE IS k DEFINED
-//				T k = (T)0;
-//				vertices->force.at(i) += (-k * (p - vSurf));
+				// // Apply zero length spring
+				// Eigen::Matrix<T, 3, 1> vSurf = p;
+				// p[1] -= sdf;
+
+				// // WHERE IS k DEFINED
+				// T k = (T)0;
+				// vertices->force.at(i) += (-k * (p - vSurf));
 			}
 			else {
 				// Move the particle up to the surface
 				// Subtract the y component by the SDF	
 				
-				vertices->pos[i](0, 1) = 0.00001;
-				
-                float fy;
-                fy = vertices->mass[i] * vertices->vel[i](0, 1) / dt;
-                vertices->force[i](0, 1) -= fy/100.0;
-
-				// for(int j = 0; j < vertices->numParticles; ++j) {
-					// vertices->pos[j](1) -= sdf;
-
-					// if(dot(surface normal, velocity) < 0)
-					// vertices->vel[j] = Eigen::Matrix<T, 1, 3>::Zero();
-					// vertices->vel[j] = -vertices->vel[j];
-				// }
+				// vertices->pos[i](0, 1) = 0.00001;
 
 				if(vertices->vel[i].dot(Eigen::Matrix<T, 1, 3>(0, 1, 0)) < 0) {
 					vertices->vel[i] = Eigen::Matrix<T, 1, 3>::Zero();
@@ -130,31 +114,3 @@ void Sim::checkCollisions(float dt, bool &collided)
 		}
 	}
 }
-
-
-/* 
- *  Write obj file
- */
-// void Sim::writeFile(std::string triangleFile) {
-//     std::ofstream myfile;
-//     myfile.open(triangleFile);
-
-//     for (int i = 0; i < vertices->numParticles; i++) {
-//         myfile << "v " << vertices->pos[i][0] << " " << vertices->pos[i][1] << " " << vertices->pos[i][2] << "\n";
-//     }
-
-//     for (int i = 0; i < tetras->numTetra; i++) {
-//         myfile << "f " << tetras->particleIndices[i][0] << " " << tetras->particleIndices[i][1] << " " << tetras->particleIndices[i][2] << "\n";
-//     }
-
-//     myfile.close();
-// }
-
-
-// void Sim::simulate() {
-// 	for (int frame = 1; frame <= 120; frame++) {
-// 		// update(0.1, frame, false);
-//         writeFile("jelly" + std::to_string(frame) + ".obj");
-//     }
-// }
-

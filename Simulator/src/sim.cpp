@@ -21,6 +21,7 @@ void Sim::init()
 		tetras->computeRestDeformation( i, vertices );
 		tetras->computeInvRestDeformation( i );
 		tetras->computeUndeformedVolume( i );
+		tetras->addMass( i, 1000.0f, vertices );
 	}
 }
 

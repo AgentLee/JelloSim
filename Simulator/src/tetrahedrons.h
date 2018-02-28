@@ -34,6 +34,8 @@ public:
     void computeInvRestDeformation( uint tetraIndex ); // Calculate inverse rest Deformation
     void computeUndeformedVolume( uint tetraIndex ); // Calculate undeformed Volume
 
+    void addMass( uint tetraIndex, float density, std::shared_ptr<Particles> vertices );
+
     // Main Update Loop
     Eigen::Matrix<T,3,3> computeNewDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices ); // Calculate new deformation
     Eigen::Matrix<T,3,3> computeF( uint tetraIndex, Eigen::Matrix<T,3,3>& Ds ); // Calculate F

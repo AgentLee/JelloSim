@@ -16,7 +16,7 @@
 using T = double;
 
 constexpr int beginFrame = 2; //1 is initial state that is written separately
-constexpr int endFrame = 70;
+constexpr int endFrame = 120;
 constexpr int numSimulationStepsPerFrame = 400;
 constexpr float dt = 1e-4;
 
@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 {
 	std::cout << "BEGIN SIM" << std::endl;
 
-	std::shared_ptr<Particles> vertices = std::make_shared<Particles>(0, 0.1f);
+	std::shared_ptr<Particles> vertices = std::make_shared<Particles>(0, 0.0f);
 	std::shared_ptr<Triangles> triangles = std::make_shared<Triangles>();
 	std::shared_ptr<Tetrahedrons> tetras = std::make_shared<Tetrahedrons>();
 
@@ -39,6 +39,7 @@ int main(int argc, char* argv[])
     for(int i=0; i<vertices->numParticles; i++)
     {
         vertices->pos[i](1) += .5; //computes and adds elastic forces to each particle
+        vertices->mass[i] = 0.0f;
     }
 
 	//Create Bgeo file for first frame

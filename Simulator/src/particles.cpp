@@ -95,7 +95,7 @@ void Particles::tetgen_readNode(const std::string &inputFileName)
 
         //Resizing all vectors in Particles
         numParticles = numPoints;
-        mass.resize(numPoints, 1.0f); //giving mass of 1 to all particles
+        mass.resize(numPoints, 0.0f); //giving mass of 1 to all particles
         vel.resize(numPoints, Eigen::Matrix<T,1,3>::Zero());
         pos.resize(numPoints);
         force.resize(numPoints);

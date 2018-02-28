@@ -34,6 +34,17 @@ void Tetrahedrons::computeUndeformedVolume( uint tetraIndex )
     undeformedVolume[tetraIndex] = oneSixth * std::abs( restDeformation[tetraIndex].determinant() );
 }
 
+void Tetrahedrons::addMass( uint tetraIndex, float density, std::shared_ptr<Particles> vertices )
+{
+    Eigen::Matrix<uint, 1, 4> vertexIndices = particleIndices[tetraIndex];
+
+    for(uint i=0; i<4; i++)
+    {
+        vertices->mass[vertexIndices(0, i)] += 0.25f * density * undeformedVolume[tetraIndex];
+    }
+
+}
+
 Eigen::Matrix<T, 3, 3> Tetrahedrons::computeNewDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices )
 {
     Eigen::Matrix<uint, 1, 4> vertexIndices = particleIndices[tetraIndex];
@@ -99,7 +110,7 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Mat
 {
     // mu = k / (2 * (1 + poisson ratio))
     // lambda = (k * poisson ratio) / ((1 + poisson ratio) (1 - 2 * poisson ratio))
-    float youngsMod = 500000;
+    float youngsMod = 500000.0;
     float poisson = 0.3;   // Make sure this is always less than 0.5 otherwise values go to infinity
     float mu = youngsMod / (2 * (1 + poisson));
     float lamda = (youngsMod * poisson) / ((1 + poisson) * (1 - 2 * poisson));

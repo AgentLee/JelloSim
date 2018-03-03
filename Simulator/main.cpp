@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <iostream>
+#include <time.h>
 
 #include "src/particles.h"
 #include "src/triangles.h"
@@ -16,7 +17,7 @@
 using T = double;
 
 constexpr int beginFrame = 2; //1 is initial state that is written separately
-constexpr int endFrame = 120;
+constexpr int endFrame = 80;
 constexpr int numSimulationStepsPerFrame = 400;
 constexpr float dt = 1e-4;
 
@@ -28,8 +29,7 @@ const std::string baseFileNamePoints = "../Assets/BGEOs/jelloTestFrame";
 
 int main(int argc, char* argv[])
 {
-	std::cout << "BEGIN SIM" << std::endl;
-
+	
 	std::shared_ptr<Particles> vertices = std::make_shared<Particles>(0, 0.0f);
 	std::shared_ptr<Triangles> triangles = std::make_shared<Triangles>();
 	std::shared_ptr<Tetrahedrons> tetras = std::make_shared<Tetrahedrons>();
@@ -46,7 +46,10 @@ int main(int argc, char* argv[])
 	Utils::writeBGEOforFrame( baseFileNamePoints, 1, vertices );
 
 	//Initialize Jello Sim
+	clock_t t;
+	t = clock();		// Start sim
 	std::shared_ptr<Sim> sim = std::make_shared<Sim>( tetras, vertices );
+	std::cout << "Simualting Frame: 1" << "..." << std::endl;
 	sim->init();
 
 	bool collided = false;
@@ -54,15 +57,17 @@ int main(int argc, char* argv[])
 	//Main Loop of Jello Sim
 	for(int i=beginFrame; i<=endFrame; i++)
 	{
+		std::cout << "Simualting Frame: " << i << "..." << std::endl;
 		for(int j=0; j<=numSimulationStepsPerFrame; j++)
 		{
 			sim->update(dt, i, collided);
 		}
 
-		std::cout << "Frame: " << i << std::endl;
 		Utils::writeBGEOforFrame( baseFileNamePoints, i, vertices );
 	}
+	t = clock() - t;	// End sim
 
-	std::cout << "END SIM" << std::endl;
+	std::cout << "Simulated in " << ((float)t)/CLOCKS_PER_SEC << " seconds." << std::endl;
+	
 	return 0;
 }

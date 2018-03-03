@@ -11,16 +11,19 @@ Sim::Sim(std::shared_ptr<Tetrahedrons> tetrahedronList, std::shared_ptr<Particle
 
 void Sim::init()
 {
-	// Precompute rest deformation (Dm), volume, inverse Dm for each tetrahedron
+	// Precompute rest deformation (Dm), volume, inverse Dm, and volume*inverseDmTranspose for each tetrahedron
 	tetras->restDeformation.resize(tetras->numTetra);
 	tetras->restInverseDeformation.resize(tetras->numTetra);
 	tetras->undeformedVolume.resize(tetras->numTetra);
+	tetras->undefVol_into_restInvDefTranspose.resize(tetras->numTetra);
 
 	for(int i=0; i<tetras->numTetra; i++)
 	{
 		tetras->computeRestDeformation( i, vertices );
 		tetras->computeInvRestDeformation( i );
 		tetras->computeUndeformedVolume( i );
+		tetras->computeUndefVol_into_restInvDefTranspose( i );
+
 		tetras->addMass( i, 1000.0f, vertices );
 	}
 }
@@ -45,7 +48,7 @@ void Sim::computeElasticForces( int tetraIndex, int frame, bool &collided )
 	Eigen::Matrix<T,3,3> newDeformation = tetras->computeNewDeformation( tetraIndex, vertices ); // Compute Ds, the new deformation
 	Eigen::Matrix<T,3,3> F 				= tetras->computeF( tetraIndex, newDeformation ); // Compute F = Ds(Dm_inv)
 	Eigen::Matrix<T,3,3> P 				= tetras->computeP( tetraIndex, F, frame, collided ); // Compute Piola (P)
-	Eigen::Matrix<T,3,3> H 				= tetras->computeH( tetraIndex, P, newDeformation ); // Compute Energy (H)
+	Eigen::Matrix<T,3,3> H 				= tetras->computeH( tetraIndex, P ); // Compute Energy (H)
 
 	tetras->addForces( tetraIndex, vertices, H );// Add energy to forces (f += h)
 }
@@ -58,7 +61,7 @@ void Sim::update(float dt, int frame, bool &collided)
     // External forces like gravity
     for(int i=0; i<vertices->numParticles; i++)
     {
-        vertices->force[i](0,1) -= 9.81 * vertices->mass[i];//*m //computes and adds elastic forces to each particle
+        vertices->force[i](0,1) -= 9.81 * vertices->mass[i]; //computes and adds elastic forces to each particle
     }
 
 	// Loop through tetras

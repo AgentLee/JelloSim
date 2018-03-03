@@ -6,45 +6,6 @@
 Tetrahedrons::Tetrahedrons()
 {}
 
-void Tetrahedrons::computeRestDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices )
-{
-    Eigen::Matrix<uint, 1, 4> vertexIndices = particleIndices[tetraIndex];
-    Eigen::Matrix<double, 3, 3> restDef;
-
-    for(uint i=0; i<3; i++)
-    {
-        //x1-x4  x2-x4  x3-x4
-        //y1-y4  y2-y4  y3-y4
-        //z1-z4  z2-z4  z3-z4
-        restDef(i, 0) = vertices->pos[vertexIndices(0, 0)][i] - vertices->pos[vertexIndices(0, 3)][i];
-        restDef(i, 1) = vertices->pos[vertexIndices(0, 1)][i] - vertices->pos[vertexIndices(0, 3)][i];
-        restDef(i, 2) = vertices->pos[vertexIndices(0, 2)][i] - vertices->pos[vertexIndices(0, 3)][i];
-    }
-
-    restDeformation[tetraIndex] = restDef;
-}
-
-void Tetrahedrons::computeInvRestDeformation( uint tetraIndex )
-{
-    restInverseDeformation[tetraIndex] = restDeformation[tetraIndex].inverse();
-}
-
-void Tetrahedrons::computeUndeformedVolume( uint tetraIndex )
-{
-    undeformedVolume[tetraIndex] = oneSixth * std::abs( restDeformation[tetraIndex].determinant() );
-}
-
-void Tetrahedrons::addMass( uint tetraIndex, float density, std::shared_ptr<Particles> vertices )
-{
-    Eigen::Matrix<uint, 1, 4> vertexIndices = particleIndices[tetraIndex];
-
-    for(uint i=0; i<4; i++)
-    {
-        vertices->mass[vertexIndices(0, i)] += 0.25f * density * undeformedVolume[tetraIndex];
-    }
-
-}
-
 Eigen::Matrix<T, 3, 3> Tetrahedrons::computeNewDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices )
 {
     Eigen::Matrix<uint, 1, 4> vertexIndices = particleIndices[tetraIndex];
@@ -63,6 +24,37 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeNewDeformation( uint tetraIndex, std
     }
 
     return newDef;
+}
+
+void Tetrahedrons::computeRestDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices )
+{
+    restDeformation[tetraIndex] = this->computeNewDeformation( tetraIndex, vertices );
+}
+
+void Tetrahedrons::computeInvRestDeformation( uint tetraIndex )
+{
+    restInverseDeformation[tetraIndex] = restDeformation[tetraIndex].inverse();
+}
+
+void Tetrahedrons::computeUndeformedVolume( uint tetraIndex )
+{
+    undeformedVolume[tetraIndex] = oneSixth * std::abs( restDeformation[tetraIndex].determinant() );
+}
+
+void Tetrahedrons::computeUndefVol_into_restInvDefTranspose( uint tetraIndex )
+{
+    undefVol_into_restInvDefTranspose[tetraIndex] = undeformedVolume[tetraIndex] * restInverseDeformation[tetraIndex].transpose();
+}
+
+void Tetrahedrons::addMass( uint tetraIndex, float density, std::shared_ptr<Particles> vertices )
+{
+    Eigen::Matrix<uint, 1, 4> vertexIndices = particleIndices[tetraIndex];
+
+    for(uint i=0; i<4; i++)
+    {
+        vertices->mass[vertexIndices(0, i)] += 0.25f * density * undeformedVolume[tetraIndex];
+    }
+
 }
 
 Eigen::Matrix<T, 3, 3> Tetrahedrons::computeF( uint tetraIndex, Eigen::Matrix<T,3,3>& Ds )
@@ -127,34 +119,18 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Mat
 
     Eigen::Matrix<T,3,3> R = U * V.transpose();
 
-    // if(frame < 45 && collided) {
-    //     std::cout << "F" << tetraIndex << ": " << std::endl;
-    //     std::cout << F << std::endl;
-    //     std::cout << "R: " << std::endl;
-    //     std::cout << R << std::endl;
-    //     std::cout << "------" << std::endl;
-    // }
-
-    // USE BELOW LINES OF CODE TO USE LINEAR COROTATED METHOD
-    // Eigen::Matrix<T,3,3> I = Eigen::Matrix<T, 3, 3>::Identity();
-    // Eigen::Matrix<T,3,3> trTerm = R.transpose() * F - I;
-    // P = 2.f * mu * (F - R) + lamda * trTerm.trace() * R;
-
     float j = F.determinant();
     Eigen::Matrix<T,3,3> JFInvTr  = Eigen::Matrix<T, 3, 3>::Zero();
     JFInvTr = jInvTrMat(F);
-//    if (F.determinant() != 0) {
-//        JFInvTr = j * F.inverse().transpose();
-//    }
 
     Eigen::Matrix<T, 3, 3> P = Eigen::Matrix<T, 3, 3>::Zero();
     P = 2* mu * (F - R) + lamda * (j - 1.f) * JFInvTr;
     return P;
 }
 
-Eigen::Matrix<T, 3, 3> Tetrahedrons::computeH( uint tetraIndex, Eigen::Matrix<T,3,3>& P, Eigen::Matrix<T,3,3>& Ds )
+Eigen::Matrix<T, 3, 3> Tetrahedrons::computeH( uint tetraIndex, Eigen::Matrix<T,3,3>& P )
 {
-    Eigen::Matrix<T, 3, 3> H = -(undeformedVolume[tetraIndex] * P * restInverseDeformation[tetraIndex].transpose());
+    Eigen::Matrix<T, 3, 3> H = -( P * undefVol_into_restInvDefTranspose[tetraIndex] );
     return H;
 }
 

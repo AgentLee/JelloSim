@@ -28,11 +28,13 @@ public:
     std::vector<T> undeformedVolume; //W
     std::vector<Eigen::Matrix<T, 3, 3>> restDeformation; //Dm
     std::vector<Eigen::Matrix<T, 3, 3>> restInverseDeformation; //Dm inverse
+    std::vector<Eigen::Matrix<T, 3, 3>> undefVol_into_restInvDefTranspose; //undeformedVolume[tetraIndex] * restInverseDeformation[tetraIndex].transpose()
 
     // Precompute
     void computeRestDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices ); // Calculate rest Deformation
     void computeInvRestDeformation( uint tetraIndex ); // Calculate inverse rest Deformation
     void computeUndeformedVolume( uint tetraIndex ); // Calculate undeformed Volume
+    void computeUndefVol_into_restInvDefTranspose( uint tetraIndex ); // Calculate undeformed Volume( uint tetraIndex ); // Calculate undeformed Volume
 
     void addMass( uint tetraIndex, float density, std::shared_ptr<Particles> vertices );
 
@@ -40,7 +42,7 @@ public:
     Eigen::Matrix<T,3,3> computeNewDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices ); // Calculate new deformation
     Eigen::Matrix<T,3,3> computeF( uint tetraIndex, Eigen::Matrix<T,3,3>& Ds ); // Calculate F
     Eigen::Matrix<T,3,3> computeP( uint tetraIndex, const Eigen::Matrix<T,3,3>& F, int frame, bool &collided ); // Calculate P
-    Eigen::Matrix<T,3,3> computeH( uint tetraIndex, Eigen::Matrix<T,3,3>& P, Eigen::Matrix<T,3,3>& Ds ); // Calculate H
+    Eigen::Matrix<T,3,3> computeH( uint tetraIndex, Eigen::Matrix<T,3,3>& P ); // Calculate H
 
     //Add a force to every particle that comprises the tetrahedron
     void addForces( uint tetraIndex, std::shared_ptr<Particles> vertices, Eigen::Matrix<T,3,3>& H );

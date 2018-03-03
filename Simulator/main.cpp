@@ -17,7 +17,7 @@
 using T = double;
 
 constexpr int beginFrame = 2; //1 is initial state that is written separately
-constexpr int endFrame = 3;
+constexpr int endFrame = 80;
 constexpr int numSimulationStepsPerFrame = 400;
 constexpr float dt = 1e-4;
 
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 	clock_t t;
 	t = clock();		// Start sim
 	std::shared_ptr<Sim> sim = std::make_shared<Sim>( tetras, vertices );
-	std::cout << "Simualting Frame: 1" << "...";
+	std::cout << "Simualting Frame: 1" << "..." << std::endl;
 	sim->init();
 
 	bool collided = false;
@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
 	//Main Loop of Jello Sim
 	for(int i=beginFrame; i<=endFrame; i++)
 	{
-		std::cout << "Simualting Frame: " << i << "...";
+		std::cout << "Simualting Frame: " << i << "..." << std::endl;
 		for(int j=0; j<=numSimulationStepsPerFrame; j++)
 		{
 			sim->update(dt, i, collided);

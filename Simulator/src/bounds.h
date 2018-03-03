@@ -8,8 +8,6 @@
 
 #include "globals.h"
 
-//using T = double;
-
 class Bounds
 {
 public:

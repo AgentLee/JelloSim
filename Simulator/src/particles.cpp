@@ -18,8 +18,6 @@ Particles::Particles(int n, T initialMass): numParticles(n)
     }
 }
 
-
-
 /* 
  * Using sympledic Euler to update speed and velocity based on 
  * the force, mass and previous state

@@ -8,7 +8,7 @@ Tetrahedrons::Tetrahedrons()
 
 Eigen::Matrix<T, 3, 3> Tetrahedrons::computeNewDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices )
 {
-    Eigen::Matrix<uint, 1, 4> vertexIndices = particleIndices[tetraIndex];
+    Eigen::Matrix<uint, 4, 1> vertexIndices = particleIndices[tetraIndex];
     Eigen::Matrix<T, 3, 3> newDef = Eigen::Matrix<T, 3, 3>::Zero();
 
     for(uint i=0; i < 3; i++)
@@ -18,9 +18,9 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeNewDeformation( uint tetraIndex, std
             y1-y4  y2-y4  y3-y4
             z1-z4  z2-z4  z3-z4
         */
-        newDef(i, 0) = vertices->pos[vertexIndices(0, 0)][i] - vertices->pos[vertexIndices(0, 3)][i];
-        newDef(i, 1) = vertices->pos[vertexIndices(0, 1)][i] - vertices->pos[vertexIndices(0, 3)][i];
-        newDef(i, 2) = vertices->pos[vertexIndices(0, 2)][i] - vertices->pos[vertexIndices(0, 3)][i];
+        newDef(i, 0) = vertices->pos[vertexIndices(0)][i] - vertices->pos[vertexIndices(3)][i];
+        newDef(i, 1) = vertices->pos[vertexIndices(1)][i] - vertices->pos[vertexIndices(3)][i];
+        newDef(i, 2) = vertices->pos[vertexIndices(2)][i] - vertices->pos[vertexIndices(3)][i];
     }
 
     return newDef;
@@ -48,16 +48,16 @@ void Tetrahedrons::computeUndefVol_into_restInvDefTranspose( uint tetraIndex )
 
 void Tetrahedrons::addMass( uint tetraIndex, float density, std::shared_ptr<Particles> vertices )
 {
-    Eigen::Matrix<uint, 1, 4> vertexIndices = particleIndices[tetraIndex];
+    Eigen::Matrix<uint, 4, 1> vertexIndices = particleIndices[tetraIndex];
 
     for(uint i=0; i<4; i++)
     {
-        vertices->mass[vertexIndices(0, i)] += 0.25f * density * undeformedVolume[tetraIndex];
+        vertices->mass[vertexIndices(i)] += 0.25f * density * undeformedVolume[tetraIndex];
     }
 
 }
 
-Eigen::Matrix<T, 3, 3> Tetrahedrons::computeF( uint tetraIndex, Eigen::Matrix<T,3,3>& Ds )
+Eigen::Matrix<T, 3, 3> Tetrahedrons::computeF( uint tetraIndex, Eigen::Matrix<T, 3, 3>& Ds )
 {
     Eigen::Matrix<T, 3, 3> F = Ds * restInverseDeformation[tetraIndex];
 
@@ -77,9 +77,9 @@ Eigen::Matrix<T, 3, 3> jInvTrMat(const Eigen::Matrix<T,3,3>& mat)
 {
     float A, B, C, D, E, F, G, H, I;
     float a, b, c, d, e, f, g, h, i;
-    a = mat(0,0), b = mat(1,0), c = mat(2,0),
-    d = mat(0,1), e = mat(1,1), f = mat(2,1),
-    g = mat(0,2), h = mat(1,2), i = mat(2,2);
+    a = mat(0,0), b = mat(0,1), c = mat(0,2),
+    d = mat(1,0), e = mat(1,1), f = mat(1,2),
+    g = mat(2,0), h = mat(2,1), i = mat(2,2);
     A = e*i-f*h;
     B = f*g-d*i;
     C = d*h-e*g;
@@ -91,9 +91,9 @@ Eigen::Matrix<T, 3, 3> jInvTrMat(const Eigen::Matrix<T,3,3>& mat)
     I = a*e-b*d;
 
     Eigen::Matrix<T, 3, 3> retMat;
-    retMat(0,0) = A, retMat(1,0) = B, retMat(2,0) = C,
-    retMat(0,1) = D, retMat(1,1) = E, retMat(2,1) = F,
-    retMat(0,2) = G, retMat(1,2) = H, retMat(2,2) = I;
+    retMat(0,0) = A, retMat(0,1) = B, retMat(0,2) = C,
+    retMat(1,0) = D, retMat(1,1) = E, retMat(1,2) = F,
+    retMat(2,0) = G, retMat(2,1) = H, retMat(2,2) = I;
 
     return retMat;
 }
@@ -117,32 +117,32 @@ Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Mat
         V.col(2) *= -1;
     }
 
-    Eigen::Matrix<T,3,3> R = U * V.transpose();
+    Eigen::Matrix<T, 3, 3> R = U * V.transpose();
 
     float j = F.determinant();
-    Eigen::Matrix<T,3,3> JFInvTr  = Eigen::Matrix<T, 3, 3>::Zero();
+    Eigen::Matrix<T, 3, 3> JFInvTr  = Eigen::Matrix<T, 3, 3>::Zero();
     JFInvTr = jInvTrMat(F);
 
     Eigen::Matrix<T, 3, 3> P = Eigen::Matrix<T, 3, 3>::Zero();
-    P = 2* mu * (F - R) + lamda * (j - 1.f) * JFInvTr;
+    P = 2.0f * mu * (F - R) + lamda * (j - 1.f) * JFInvTr;
     return P;
 }
 
-Eigen::Matrix<T, 3, 3> Tetrahedrons::computeH( uint tetraIndex, Eigen::Matrix<T,3,3>& P )
+Eigen::Matrix<T, 3, 3> Tetrahedrons::computeH( uint tetraIndex, Eigen::Matrix<T, 3, 3>& P )
 {
     Eigen::Matrix<T, 3, 3> H = -( P * undefVol_into_restInvDefTranspose[tetraIndex] );
     return H;
 }
 
-void Tetrahedrons::addForces( uint tetraIndex, std::shared_ptr<Particles> vertices, Eigen::Matrix<T,3,3>& H )
+void Tetrahedrons::addForces( uint tetraIndex, std::shared_ptr<Particles> vertices, Eigen::Matrix<T, 3, 3>& H )
 {
     // Add forces to particles that make up the tetrahedron (f += h)
     // f4 += -(h1 + h2 + h3)
-    Eigen::Matrix<uint, 1, 4> vertexIndices = particleIndices[tetraIndex];
-    vertices->force[vertexIndices(0, 0)] += H.col(0);
-    vertices->force[vertexIndices(0, 1)] += H.col(1);
-    vertices->force[vertexIndices(0, 2)] += H.col(2);
-    vertices->force[vertexIndices(0, 3)] += -(H.col(0) + H.col(1) + H.col(2));
+    Eigen::Matrix<uint, 4, 1> vertexIndices = particleIndices[tetraIndex];
+    vertices->force[vertexIndices(0)] += H.col(0);
+    vertices->force[vertexIndices(1)] += H.col(1);
+    vertices->force[vertexIndices(2)] += H.col(2);
+    vertices->force[vertexIndices(3)] += -(H.col(0) + H.col(1) + H.col(2));
 }
 
 /*
@@ -167,7 +167,7 @@ void Tetrahedrons::tetgen_readLine(std::ifstream &fin, int nodesPerTet)
     {
         float num;
         fin >> num;
-        particleIndices[f-1](0, i) = num - 1;
+        particleIndices[f-1](i) = num - 1;
     }
 }
 

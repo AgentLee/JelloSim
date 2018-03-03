@@ -22,7 +22,7 @@ public:
 	Tetrahedrons();
 
     int numTetra;
-    std::vector<Eigen::Matrix<uint, 1, 4>> particleIndices;
+    std::vector<Eigen::Matrix<uint, 4, 1>> particleIndices;
 
     //Needed for FEM Calculations
     std::vector<T> undeformedVolume; //W
@@ -39,10 +39,10 @@ public:
     void addMass( uint tetraIndex, float density, std::shared_ptr<Particles> vertices );
 
     // Main Update Loop
-    Eigen::Matrix<T,3,3> computeNewDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices ); // Calculate new deformation
-    Eigen::Matrix<T,3,3> computeF( uint tetraIndex, Eigen::Matrix<T,3,3>& Ds ); // Calculate F
-    Eigen::Matrix<T,3,3> computeP( uint tetraIndex, const Eigen::Matrix<T,3,3>& F, int frame, bool &collided ); // Calculate P
-    Eigen::Matrix<T,3,3> computeH( uint tetraIndex, Eigen::Matrix<T,3,3>& P ); // Calculate H
+    Eigen::Matrix<T, 3, 3> computeNewDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices ); // Calculate new deformation
+    Eigen::Matrix<T, 3, 3> computeF( uint tetraIndex, Eigen::Matrix<T, 3, 3>& Ds ); // Calculate F
+    Eigen::Matrix<T, 3, 3> computeP( uint tetraIndex, const Eigen::Matrix<T, 3, 3>& F, int frame, bool &collided ); // Calculate P
+    Eigen::Matrix<T, 3, 3> computeH( uint tetraIndex, Eigen::Matrix<T, 3, 3>& P ); // Calculate H
 
     //Add a force to every particle that comprises the tetrahedron
     void addForces( uint tetraIndex, std::shared_ptr<Particles> vertices, Eigen::Matrix<T,3,3>& H );

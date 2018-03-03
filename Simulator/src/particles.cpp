@@ -7,29 +7,18 @@ Particles::Particles(int n, T initialMass): numParticles(n)
     {
         mass.push_back(initialMass);
         
-        Eigen::Matrix<T,1,3> vel_particle = Eigen::Matrix<T,1,3>::Zero();
+        Eigen::Matrix<T, 3, 1> vel_particle = Eigen::Matrix<T, 3, 1>::Zero();
         vel.push_back(vel_particle);
 
-        Eigen::Matrix<T,1,3> pos_particle = Eigen::Matrix<T,1,3>::Zero();
+        Eigen::Matrix<T, 3, 1> pos_particle = Eigen::Matrix<T, 3, 1>::Zero();
         pos.push_back(pos_particle);
 
-        Eigen::Matrix<T,1,3> force_particle = Eigen::Matrix<T,1,3>::Zero();
+        Eigen::Matrix<T, 3, 1> force_particle = Eigen::Matrix<T, 3, 1>::Zero();
         force.push_back(force_particle);
     }
 }
 
-/* 
- * Initialize all particles with random values
- */
-void Particles::initializeParticles_random()
-{
-    for(int i=0; i<numParticles; i++)
-    {
-        mass[i] = std::rand() % 100;
-        vel[i] = Eigen::Matrix<T,1,3>::Random(1,3);
-        pos[i] = Eigen::Matrix<T,1,3>::Random(1,3);
-    }
-}
+
 
 /* 
  * Using sympledic Euler to update speed and velocity based on 
@@ -51,6 +40,8 @@ void Particles::updateParticleVelocity(T dt)
     }
 }
 
+
+
 /*
  *  .node FILE FORMAT:
  *      http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html
@@ -70,7 +61,7 @@ void Particles::tetgen_readLine(std::ifstream &fin, int numDims, int numAtt)
     fin >> f; // first one is id..
     for(int i = 0; i < numDims; ++i)
     {
-        fin >> pos[f-1](0,i);
+        fin >> pos[f-1](i);
     }
 
     for(int i = 0; i < numAtt; ++i)
@@ -96,7 +87,7 @@ void Particles::tetgen_readNode(const std::string &inputFileName)
         //Resizing all vectors in Particles
         numParticles = numPoints;
         mass.resize(numPoints, 0.0f); //giving mass of 1 to all particles
-        vel.resize(numPoints, Eigen::Matrix<T,1,3>::Zero());
+        vel.resize(numPoints, Eigen::Matrix<T, 3, 1>::Zero());
         pos.resize(numPoints);
         force.resize(numPoints);
 

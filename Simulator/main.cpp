@@ -17,7 +17,7 @@
 using T = double;
 
 constexpr int beginFrame = 2; //1 is initial state that is written separately
-constexpr int endFrame = 80;
+constexpr int endFrame = 120;
 constexpr int numSimulationStepsPerFrame = 400;
 constexpr float dt = 1e-4;
 
@@ -29,7 +29,6 @@ const std::string baseFileNamePoints = "../Assets/BGEOs/jelloTestFrame";
 
 int main(int argc, char* argv[])
 {
-	
 	std::shared_ptr<Particles> vertices = std::make_shared<Particles>(0, 0.0f);
 	std::shared_ptr<Triangles> triangles = std::make_shared<Triangles>();
 	std::shared_ptr<Tetrahedrons> tetras = std::make_shared<Tetrahedrons>();

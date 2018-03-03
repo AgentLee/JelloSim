@@ -33,7 +33,7 @@ void Sim::clean()
 	//Set forces for all vertices/particles to zero
 	for(int i=0; i<vertices->numParticles; i++)
 	{
-		vertices->force[i] = Eigen::Matrix<T, 1, 3>::Zero();
+		vertices->force[i] = Eigen::Matrix<T, 3, 1>::Zero();
 	}
 }
 
@@ -61,7 +61,7 @@ void Sim::update(float dt, int frame, bool &collided)
     // External forces like gravity
     for(int i=0; i<vertices->numParticles; i++)
     {
-        vertices->force[i](0,1) -= 9.81 * vertices->mass[i]; //computes and adds elastic forces to each particle
+        vertices->force[i](1) -= 9.81 * vertices->mass[i]; //computes and adds elastic forces to each particle
     }
 
 	// Loop through tetras
@@ -85,11 +85,11 @@ void Sim::checkCollisions(float dt, bool &collided)
 	// Later do interobject collisions with a grid+bounding box or BVH
 	for(int i = 0; i< vertices->numParticles; ++i)
 	{
-		Eigen::Matrix<T, 1, 3> p(vertices->pos[i]);
+		Eigen::Matrix<T, 3, 1> p(vertices->pos[i]);
 
 		// Transform the vertex to the plane's local space
 		// Assume the plane is at the origin
-		Eigen::Matrix<T, 1, 4> n = Eigen::Matrix<T, 1, 4>(0,1,0,0);
+		Eigen::Matrix<T, 4, 1> n = Eigen::Matrix<T, 4, 1>(0, 1, 0, 0);
 		float sdf = SDF::sdPlane(p, n);
 
 		// Particle went through the surface
@@ -111,8 +111,8 @@ void Sim::checkCollisions(float dt, bool &collided)
 				
 				// vertices->pos[i](0, 1) = 0.00001;
 
-				if(vertices->vel[i].dot(Eigen::Matrix<T, 1, 3>(0, 1, 0)) < 0) {
-					vertices->vel[i] = Eigen::Matrix<T, 1, 3>::Zero();
+				if(vertices->vel[i].dot(Eigen::Matrix<T, 3, 1>(0, 1, 0)) < 0) {
+					vertices->vel[i] = Eigen::Matrix<T, 3, 1>::Zero();
 				}
 			}
 		}

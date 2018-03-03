@@ -1,6 +1,6 @@
 #include "bounds.h"
 
-bool Bounds::Contains(Vector3f& pos)
+bool Bounds::Contains(const Vector3f& pos)
 {
     if( ( pos[0] > min[0] && pos[1] > min[1] && pos[2] > min[2] ) &&
         ( pos[0] < max[0] && pos[1] < max[1] && pos[2] < max[2] ) )
@@ -28,39 +28,29 @@ int Bounds::MaximumExtent() const
     }
 }
 
-Bounds Bounds::ApplyTransform(const Mat4f& T)
+Bounds Bounds::ApplyTransform(const Matrix4f& T)
 {
     //transform the min and max points of the bounding
     //box by the transformation tr
     Bounds b = Bounds();
 
-    Point4f c1, c2, c3, c4, c5, c6, c7, c8;
-    c1 << min[0], min[1], min[2], 1.0f;
-    c2 << min[0], min[1], max[2], 1.0f;
-    c3 << min[0], max[1], min[2], 1.0f;
-    c4 << min[0], max[1], max[2], 1.0f;
-    c5 << max[0], min[1], min[2], 1.0f;
-    c6 << max[0], min[1], max[2], 1.0f;
-    c7 << max[0], max[1], min[2], 1.0f;
-    c8 << max[0], max[1], max[2], 1.0f;
+    std::vector<Point4f> c(8);
+    c[0] << min[0], min[1], min[2], 1.0f;
+    c[1] << min[0], min[1], max[2], 1.0f;
+    c[2] << min[0], max[1], min[2], 1.0f;
+    c[3] << min[0], max[1], max[2], 1.0f;
+    c[4] << max[0], min[1], min[2], 1.0f;
+    c[5] << max[0], min[1], max[2], 1.0f;
+    c[6] << max[0], max[1], min[2], 1.0f;
+    c[7] << max[0], max[1], max[2], 1.0f;
 
-    c1 = T * c1;
-    c2 = T * c2;
-    c3 = T * c3;
-    c4 = T * c4;
-    c5 = T * c5;
-    c6 = T * c6;
-    c7 = T * c7;
-    c8 = T * c8;
+    for(int i = 0; i < 8; i++) {
+        c[i] = T * c[i];
+    }
 
-    b = Union( b, c1 );
-    b = Union( b, c2 );
-    b = Union( b, c3 );
-    b = Union( b, c4 );
-    b = Union( b, c5 );
-    b = Union( b, c6 );
-    b = Union( b, c7 );
-    b = Union( b, c8 );
+    for(int i = 0; i < 8; i++) {
+        b = Union(b, c[i]);
+    }
 
     this->min = b.min;
     this->max = b.max;
@@ -127,11 +117,8 @@ bool Bounds::Intersect(const Ray& r , float* t) const
 
         return true;
     }
-    else //If t_near was greater than t_far, we did not hit the cube
-    {
-        return false;
-    }
 
+    //If t_near was greater than t_far, we did not hit the cube
     return false;
 }
 

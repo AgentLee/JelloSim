@@ -11,8 +11,11 @@ endif()
 # Configure this project
 add_cispba_executable(  sim 
 						main.cpp
-						src/forces.h
+						src/globals.h
+						src/sdf.h
 						src/utilities.h
+						src/bounds.h
+						src/bounds.cpp
 						src/particles.h
 						src/particles.cpp
 						src/triangles.h
@@ -20,9 +23,7 @@ add_cispba_executable(  sim
 						src/tetrahedrons.h
 						src/tetrahedrons.cpp
 						src/sim.h
-						src/sim.cpp
-						src/collisions.h
-						src/sdf.h )
+						src/sim.cpp )
 target_link_libraries(sim partio)
 
 target_include_directories(sim SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIR})

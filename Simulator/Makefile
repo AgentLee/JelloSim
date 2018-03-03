@@ -7,11 +7,11 @@
 SHELL := /bin/bash
 RM    := rm -rf
 MKDIR := mkdir -p
-BUILDROOT := /Users/Groverchen/Desktop/JelloSim/Build
+BUILDROOT := /mnt/d/Documents/Github/JelloSim/Build
 BUILDDEFAULT := Release
 RELATIVEPATH := Simulator
 BUILDDIR = $(BUILDROOT)/$(BUILDDEFAULT)/$(RELATIVEPATH)
-ROOTDIR := /Users/Groverchen/Desktop/JelloSim
+ROOTDIR := /mnt/d/Documents/Github/JelloSim
 BUILDTYPES := Release MinSizeRel Debug Coverage RelWithDebInfo Quick
 OTHERGOALS := $(filter-out distclean $(BUILDTYPES),$(MAKECMDGOALS))
 

@@ -22,6 +22,8 @@ add_cispba_executable(  sim
 						src/triangles.cpp 
 						src/tetrahedrons.h
 						src/tetrahedrons.cpp
+						src/mesh.h
+						src/mesh.cpp
 						src/sim.h
 						src/sim.cpp )
 target_link_libraries(sim partio)

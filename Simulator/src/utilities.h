@@ -13,6 +13,7 @@
 
 #include "particles.h"
 #include "triangles.h"
+#include "mesh.h"
 
 using namespace std;
 using T = double;
@@ -108,13 +109,17 @@ namespace Utils
 		tetras->tetgen_readEleFile(eleFile); //read in tetrahedrons with particle indices
 	}
 
-	void inline writeBGEOforFrame( std::string baseFileNamePoints, uint frameNumber, std::shared_ptr<Particles> vertices )
+	void inline writeBGEOforFrame( std::string baseFileNamePoints, uint frameNumber, std::vector<std::shared_ptr<Mesh>>& MeshList )
 	{
 		//create bgeo file for current frame
 		std::string pointsFile = baseFileNamePoints;
-        pointsFile += std::to_string(frameNumber);
-        pointsFile += ".bgeo";
-		Utils::writePartio<T, 3>(pointsFile, vertices, vertices->numParticles);
+		pointsFile += std::to_string(frameNumber);
+		pointsFile += ".bgeo";
+
+		for(uint i=0; i<MeshList.size(); i++)
+		{
+			Utils::writePartio<T, 3>(pointsFile, MeshList[i]->vertices, MeshList[i]->vertices->numParticles);
+		}
 	}
 
 	template<typename T>

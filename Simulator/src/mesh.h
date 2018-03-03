@@ -24,7 +24,7 @@ public:
 
 	//create a grid
 
-	Mesh( float _gridCellSize );
+	Mesh( float _gridCellSize, float density = 1000.0f, float poissonsRatio = 0.3f, float youngsModulus = 500000.0f ) ;
 	Mesh( std::shared_ptr<Particles> _vertices, std::shared_ptr<Triangles> _triangles, 
 		  std::shared_ptr<Tetrahedrons> _tetras, float _gridCellSize );
 
@@ -33,4 +33,7 @@ public:
 
 private:
 	float gridCellSize;
+	float density;
+	float poissonsRatio;
+	float youngsModulus;
 };

@@ -1,6 +1,7 @@
 #include "mesh.h"
 
-Mesh::Mesh( float _gridCellSize ) : gridCellSize(_gridCellSize)
+Mesh::Mesh( float _gridCellSize, float density, float poissonsRatio, float youngsModulus ) 
+        : gridCellSize(_gridCellSize)
 {
     vertices  = std::make_shared<Particles>(0, 0.0f);
     triangles = std::make_shared<Triangles>();

@@ -21,7 +21,7 @@ using T = double;
 namespace Utils
 {
 	template <class T, int dim>
-	void inline writePartio(std::string& particleFile, std::shared_ptr<Particles> vertices, int numVertices)
+	void inline writePartio(std::string& particleFile, std::shared_ptr<Particles>& vertices, int& numVertices)
 	{
 		Partio::ParticlesDataMutable* parts = Partio::create();
 		Partio::ParticleAttribute posH, vH, mH;
@@ -48,7 +48,7 @@ namespace Utils
 		parts->release();
 	};
 
-	void inline create_objFile(std::string file_name, std::shared_ptr<Particles> vertices, std::shared_ptr<Triangles> triangles)
+	void inline create_objFile(std::string file_name, std::shared_ptr<Particles>& vertices, std::shared_ptr<Triangles>& triangles)
 	{
 		ofstream objfile;
 		objfile.open (file_name);
@@ -77,7 +77,7 @@ namespace Utils
 		objfile.close();
 	}
 
-	void inline generateTrianglesFromParticles( T deltaTime, std::shared_ptr<Particles> particles, std::string fileName )
+	void inline generateTrianglesFromParticles( T& deltaTime, std::shared_ptr<Particles>& particles, std::string& fileName )
 	{
 		//generate obj file
 		std::shared_ptr<Triangles> triangles = std::make_shared<Triangles>();
@@ -89,7 +89,7 @@ namespace Utils
 		Utils::create_objFile(fileName, particles, triangles);
 	}
 
-	void inline generateTriObjFile( std::shared_ptr<Triangles> triangles,  std::shared_ptr<Particles> particles, const std::string& fileName, const std::string& objFileName )
+	void inline generateTriObjFile( std::shared_ptr<Triangles>& triangles,  std::shared_ptr<Particles>& particles, const std::string& fileName, const std::string& objFileName )
 	{
 		//generate obj file
 		triangles->tetgen_readFace(fileName);
@@ -97,7 +97,7 @@ namespace Utils
 	}
 
 	// Reads all the required files and stores stuff in respective arrays
-	void inline tetRead( std::shared_ptr<Particles> vertices, std::shared_ptr<Triangles> triangles, std::shared_ptr<Tetrahedrons> tetras,
+	void inline tetRead( std::shared_ptr<Particles>& vertices, std::shared_ptr<Triangles>& triangles, std::shared_ptr<Tetrahedrons>& tetras,
 						 const std::string& nodeFile, const std::string& faceFile, const std::string& eleFile, const std::string& objFile)
 	{
 		// read node file and store list of points (id, pos, attributes)
@@ -109,15 +109,14 @@ namespace Utils
 		tetras->tetgen_readEleFile(eleFile); //read in tetrahedrons with particle indices
 	}
 
-	void inline writeBGEOforFrame( std::string baseFileNamePoints, uint frameNumber, std::vector<std::shared_ptr<Mesh>>& MeshList )
+	void inline writeBGEOforFrame( const std::string bgeoFileNames[], uint frameNumber, std::vector<std::shared_ptr<Mesh>>& MeshList )
 	{
-		//create bgeo file for current frame
-		std::string pointsFile = baseFileNamePoints;
-		pointsFile += std::to_string(frameNumber);
-		pointsFile += ".bgeo";
-
 		for(uint i=0; i<MeshList.size(); i++)
 		{
+			//create bgeo file for current frame
+			std::string pointsFile = bgeoFileNames[i];
+			pointsFile += std::to_string(frameNumber);
+			pointsFile += ".bgeo";
 			Utils::writePartio<T, 3>(pointsFile, MeshList[i]->vertices, MeshList[i]->vertices->numParticles);
 		}
 	}

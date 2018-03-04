@@ -13,6 +13,7 @@
 
 #include "tetrahedrons.h"
 #include "particles.h"
+#include "mesh.h"
 #include "sdf.h"
 
 using T = double;
@@ -20,18 +21,20 @@ using T = double;
 class Sim
 {
 public:
-	std::shared_ptr<Tetrahedrons> tetras;
-	std::shared_ptr<Particles> vertices;
+	std::vector<std::shared_ptr<Mesh>> MeshList;
 
-	Sim(std::shared_ptr<Tetrahedrons> tetrahedronList, std::shared_ptr<Particles> particleList);
+	Sim( std::vector<std::shared_ptr<Mesh>>& MeshList );
 
 	void init();
 	void clean();
-	void computeElasticForces( int tetraIndex, int frame, bool &collided );
+	
 	void eulerIntegration(float dt);
-	void update(float dt, int frame, bool &collided);
 	void checkCollisions(float dt, bool &collided);
-	void writeFile(std::string triangleFile);
 
-	void simulate();
+	void addExternalForces();
+	void computeElasticForces( int frame, bool &collided );
+
+	void fixParticlePosition( Eigen::Matrix<T, 3, 1>& particleVel, Eigen::Matrix<T, 3, 1>& particlePos );
+
+	void update(float dt, int frame, bool &collided);
 };

@@ -18,8 +18,8 @@
 using T = double;
 
 constexpr int beginFrame = 2; //1 is initial state that is written separately
-constexpr int endFrame = 30;
-constexpr int numSimulationStepsPerFrame = 400;
+constexpr int endFrame = 120;
+constexpr int numSimulationStepsPerFrame = 300;
 constexpr float dt = 1e-4;
 
 const std::string cube_nodeFile = "../Assets/Meshes/cube_poly_0.001/cube.1.node";
@@ -56,11 +56,11 @@ int main(int argc, char* argv[])
 	Utils::writeBGEOforFrame( baseFileNamePoints, 1, MeshList );
 
 	// Start sim
-	//Initialize Jello Sim
+	// Initialize Jello Sim
 	clock_t t;
 	t = clock();
 
-	std::shared_ptr<Sim> sim = std::make_shared<Sim>( MeshList[0]->tetras, MeshList[0]->vertices );
+	std::shared_ptr<Sim> sim = std::make_shared<Sim>( MeshList );
 	sim->init();
 
 	bool collided = false;

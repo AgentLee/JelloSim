@@ -6,11 +6,15 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <iterator>
 
+#include <memory>
 #include <stdlib.h>
 #include <time.h>
 
 #include "particles.h"
+using namespace std;
 
 class Triangles
 {
@@ -20,6 +24,9 @@ public:
 
 	Triangles();
 	void addTriangle(int i, int j, int k);
+
+	//create obj file
+	void create_objFile(std::string file_name, std::shared_ptr<Particles>& vertices );
 
 	//read tetgen face file
 	void tetgen_readLine(std::ifstream &fin);

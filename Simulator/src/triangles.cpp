@@ -10,6 +10,36 @@ void Triangles::addTriangle(int i, int j, int k)
 	numTriangles++;
 }
 
+
+void Triangles::create_objFile(std::string file_name, std::shared_ptr<Particles>& vertices )
+{
+    ofstream objfile;
+    objfile.open (file_name);
+    objfile << "# " + file_name + "\n"; //comment with file name
+
+    objfile << "# vertices\n";
+    for(int i=0; i<vertices->numParticles; i++)
+    {
+        objfile << "v  ";
+        for (uint k = 0; k < 3; k++)
+        {
+            objfile << std::to_string(vertices->pos[i][k]) + "  ";
+        }
+        objfile << "\n";
+    }
+
+    objfile << "# faces\n";
+    for(int i=0; i<numTriangles; i++)
+    {
+        objfile << "f  " + std::to_string(triFaceList[i][0] + 1) + "//  "
+                         + std::to_string(triFaceList[i][1] + 1) + "//  "
+                         + std::to_string(triFaceList[i][2] + 1) + "//  " + "\n";
+    }
+
+    objfile << "# end of obj file\n";
+    objfile.close();
+}
+
 void Triangles::tetgen_readLine(std::ifstream &fin)
 {
     float f;

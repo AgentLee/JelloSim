@@ -13,7 +13,6 @@
 
 #include "particles.h"
 #include "triangles.h"
-#include "mesh.h"
 
 using namespace std;
 using T = double;
@@ -21,7 +20,7 @@ using T = double;
 namespace Utils
 {
 	template <class T, int dim>
-	void inline writePartio(std::string& particleFile, std::shared_ptr<Particles>& vertices, int& numVertices)
+	void inline writePartio(std::string& particleFile, std::shared_ptr<Particles> vertices, int numVertices)
 	{
 		Partio::ParticlesDataMutable* parts = Partio::create();
 		Partio::ParticleAttribute posH, vH, mH;
@@ -96,29 +95,14 @@ namespace Utils
 		Utils::create_objFile(objFileName, particles, triangles);
 	}
 
-	// Reads all the required files and stores stuff in respective arrays
-	void inline tetRead( std::shared_ptr<Particles>& vertices, std::shared_ptr<Triangles>& triangles, std::shared_ptr<Tetrahedrons>& tetras,
-						 const std::string& nodeFile, const std::string& faceFile, const std::string& eleFile, const std::string& objFile)
+	void inline writeBGEOforFrame( const std::string bgeoFileName, uint frameNumber, std::shared_ptr<Particles>& vertices )
 	{
-		// read node file and store list of points (id, pos, attributes)
-		// read .ele file and store tetrahedra (id, nodes)
-		// can read more files for faces, edges, etc.
+		//create bgeo file for current frame
+		std::string pointsFile = bgeoFileName;
+		pointsFile += std::to_string(frameNumber);
+		pointsFile += ".bgeo";
 
-		vertices->tetgen_readNode( nodeFile ); //read vertices
-		Utils::generateTriObjFile( triangles, vertices, faceFile, objFile ); //read faces and create obj file
-		tetras->tetgen_readEleFile(eleFile); //read in tetrahedrons with particle indices
-	}
-
-	void inline writeBGEOforFrame( const std::string bgeoFileNames[], uint frameNumber, std::vector<std::shared_ptr<Mesh>>& MeshList )
-	{
-		for(uint i=0; i<MeshList.size(); i++)
-		{
-			//create bgeo file for current frame
-			std::string pointsFile = bgeoFileNames[i];
-			pointsFile += std::to_string(frameNumber);
-			pointsFile += ".bgeo";
-			Utils::writePartio<T, 3>(pointsFile, MeshList[i]->vertices, MeshList[i]->vertices->numParticles);
-		}
+		Utils::writePartio<T, 3>(pointsFile, vertices, vertices->numParticles);
 	}
 
 	template<typename T>

@@ -21,8 +21,10 @@ constexpr int beginFrame = 2; //1 is initial state that is written separately
 constexpr int endFrame = 70;
 constexpr int numSimulationStepsPerFrame = 300;
 constexpr float dt = 1e-4;
+constexpr float density = 1000.f;
+constexpr float youngsModulus = 500000.0f;
+constexpr float poissonsRatio = 0.3f;
 
-constexpr uint numObjects = 2;
 const std::string nodeFileNames[] = { "../Assets/Meshes/cube_poly_0.001/cube.1.node",
 									  "../Assets/Meshes/cube_poly_0.5/cube.1.node" };
 const std::string faceFileNames[] = { "../Assets/Meshes/cube_poly_0.001/cube.1.face",
@@ -37,35 +39,32 @@ const std::string bgeoFileNames[] = { "../Assets/BGEOs/jelloCube1Frame",
 void createScene( std::vector<std::shared_ptr<Mesh>>& MeshList )
 {
 	const float gridCellSize = 1.0f;
+	Vector3f translation = Vector3f(0.0f, 1.0f, 0.0f);
 
 	{
-		std::shared_ptr<Mesh> cube1 = std::make_shared<Mesh>( gridCellSize );
-		Utils::tetRead( cube1->vertices, cube1->triangles, cube1->tetras, 
-						nodeFileNames[0], faceFileNames[0], eleFileNames[0], objFileNames[0] );
-
-		for(int i=0; i<cube1->vertices->numParticles; i++)
-		{
-			//move mesh up by 1m and reset mass to zero
-			cube1->vertices->pos[i](1) += 1.0f;
-			cube1->vertices->mass[i] = 0.0f;
-		}
-
+		std::shared_ptr<Mesh> cube1 = std::make_shared<Mesh>( nodeFileNames[0], faceFileNames[0], 
+															eleFileNames[0], objFileNames[0], gridCellSize, 
+															density, poissonsRatio, youngsModulus );
+		cube1->translateMesh(translation);
 		MeshList.push_back(cube1);
 	}
 
 	{
-		std::shared_ptr<Mesh> cube2 = std::make_shared<Mesh>( gridCellSize );
-		Utils::tetRead( cube2->vertices, cube2->triangles, cube2->tetras, 
-						nodeFileNames[1], faceFileNames[1], eleFileNames[1], objFileNames[1] );
-
-		for(int i=0; i<cube2->vertices->numParticles; i++)
-		{
-			//move mesh up by 1m and reset mass to zero
-			cube2->vertices->pos[i](1) += 3.0f;
-			cube2->vertices->mass[i] = 0.0f;
-		}
-
+		translation = Vector3f(3.0f, 3.0f, 0.0f);
+		std::shared_ptr<Mesh> cube2 = std::make_shared<Mesh>( nodeFileNames[1], faceFileNames[1], 
+															eleFileNames[1], objFileNames[1], gridCellSize, 
+															density, poissonsRatio, youngsModulus );
+		cube2->translateMesh(translation);
 		MeshList.push_back(cube2);
+	}
+}
+
+void writeBGEOsforMeshes( std::vector<std::shared_ptr<Mesh>>& MeshList, int frameNumber )
+{
+	std::cout << "Simualting Frame: " << frameNumber << "..." << std::endl;
+	for(uint i=0; i<MeshList.size(); i++)
+	{
+		Utils::writeBGEOforFrame( bgeoFileNames[i], frameNumber, MeshList[i]->vertices );
 	}
 }
 
@@ -75,8 +74,7 @@ int main(int argc, char* argv[])
 	createScene( MeshList );
 
 	//Create Bgeo file for first frame
-	std::cout << "Simualting Frame: 1" << "..." << std::endl;
-	Utils::writeBGEOforFrame( bgeoFileNames, 1, MeshList );
+	writeBGEOsforMeshes( MeshList, 1 );
 
 	// Start sim
 	// Initialize Jello Sim
@@ -93,13 +91,12 @@ int main(int argc, char* argv[])
 	//Main Loop of Jello Sim
 	for(int i=beginFrame; i<=endFrame; i++)
 	{
-		std::cout << "Simualting Frame: " << i << "..." << std::endl;
 		for( int j = 0; j <= numSimulationStepsPerFrame; j++ )
 		{
 			sim->update(dt, i, collided);
 		}
 
-		Utils::writeBGEOforFrame( bgeoFileNames, i, MeshList );
+		writeBGEOsforMeshes( MeshList, i );
 	}
 	t = clock() - t;	// End sim
 

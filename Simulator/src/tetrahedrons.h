@@ -19,9 +19,12 @@ using T = double;
 class Tetrahedrons
 {
 public:
-	Tetrahedrons();
+	Tetrahedrons( float density, float _poissonsRatio, float Y );
 
     int numTetra;
+    float density;
+    float poissonsRatio;
+    float youngsModulus;
     std::vector<Eigen::Matrix<uint, 4, 1>> particleIndices;
 
     //Needed for FEM Calculations
@@ -36,7 +39,7 @@ public:
     void computeUndeformedVolume( uint tetraIndex ); // Calculate undeformed Volume
     void computeUndefVol_into_restInvDefTranspose( uint tetraIndex ); // Calculate undeformed Volume( uint tetraIndex ); // Calculate undeformed Volume
 
-    void addMass( uint tetraIndex, float density, std::shared_ptr<Particles> vertices );
+    void addMass( uint tetraIndex, std::shared_ptr<Particles> vertices );
 
     // Main Update Loop
     Eigen::Matrix<T, 3, 3> computeNewDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices ); // Calculate new deformation

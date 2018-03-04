@@ -3,7 +3,8 @@
 
 #define oneSixth 0.166666666667
 
-Tetrahedrons::Tetrahedrons()
+Tetrahedrons::Tetrahedrons( float d, float _poissonsRatio, float Y ) 
+    : density(d), poissonsRatio(_poissonsRatio), youngsModulus(Y)
 {}
 
 Eigen::Matrix<T, 3, 3> Tetrahedrons::computeNewDeformation( uint tetraIndex, std::shared_ptr<Particles> vertices )
@@ -46,7 +47,7 @@ void Tetrahedrons::computeUndefVol_into_restInvDefTranspose( uint tetraIndex )
     undefVol_into_restInvDefTranspose[tetraIndex] = undeformedVolume[tetraIndex] * restInverseDeformation[tetraIndex].transpose();
 }
 
-void Tetrahedrons::addMass( uint tetraIndex, float density, std::shared_ptr<Particles> vertices )
+void Tetrahedrons::addMass( uint tetraIndex, std::shared_ptr<Particles> vertices )
 {
     Eigen::Matrix<uint, 4, 1> vertexIndices = particleIndices[tetraIndex];
 
@@ -54,7 +55,6 @@ void Tetrahedrons::addMass( uint tetraIndex, float density, std::shared_ptr<Part
     {
         vertices->mass[vertexIndices(i)] += 0.25f * density * undeformedVolume[tetraIndex];
     }
-
 }
 
 Eigen::Matrix<T, 3, 3> Tetrahedrons::computeF( uint tetraIndex, Eigen::Matrix<T, 3, 3>& Ds )
@@ -100,12 +100,11 @@ Eigen::Matrix<T, 3, 3> jInvTrMat(const Eigen::Matrix<T,3,3>& mat)
 
 Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Matrix<T,3,3>& F, int frame, bool &collided )
 {
+    // ensure poissons ratio is always less than 0.5 otherwise things become infinity
     // mu = k / (2 * (1 + poisson ratio))
     // lambda = (k * poisson ratio) / ((1 + poisson ratio) (1 - 2 * poisson ratio))
-    float youngsMod = 500000.0;
-    float poisson = 0.3;   // Make sure this is always less than 0.5 otherwise values go to infinity
-    float mu = youngsMod / (2 * (1 + poisson));
-    float lamda = (youngsMod * poisson) / ((1 + poisson) * (1 - 2 * poisson));
+    float mu = youngsModulus / (2 * (1 + poissonsRatio));
+    float lamda = (youngsModulus * poissonsRatio) / ((1 + poissonsRatio) * (1 - 2 * poissonsRatio));
 
     Eigen::JacobiSVD<Eigen::Matrix<T, 3, 3>> svd(F, Eigen::ComputeFullV | Eigen::ComputeFullU);
     Eigen::Matrix<T, 3, 3> U = svd.matrixU();

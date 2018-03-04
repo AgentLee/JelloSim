@@ -22,18 +22,29 @@ public:
 	std::shared_ptr<Tetrahedrons> tetras;
 	Bounds AABB;
 
-	//create a grid
+	// grid that stores the triangles of the mesh; 
+	// grid extends beyond the biggest AABB that could be formed to accommodate stretching and
+	// prevent resizing of the grid
+	std::vector<uint> grid;
 
-	Mesh( float _gridCellSize, float density = 1000.0f, float poissonsRatio = 0.3f, float youngsModulus = 500000.0f ) ;
+	Mesh( const std::string& nodeFile, const std::string& faceFile, 
+		const std::string& eleFile, const std::string& objFile,
+		float _gridCellSize, float _density, float _poissonsRatio, float _youngsModulus );
 	Mesh( std::shared_ptr<Particles> _vertices, std::shared_ptr<Triangles> _triangles, 
-		  std::shared_ptr<Tetrahedrons> _tetras, float _gridCellSize );
+		std::shared_ptr<Tetrahedrons> _tetras, float _gridCellSize );
+
+	// Method of computing a 1D index from a 3D grid index.
+	int gridIndex3Dto1D(int x, int y, int z, int gridResolution);
 
 	void calcBounds();
 	void updateBounds();
+	void initializeGrid();
+
+	void resetMass();
+	void translateMesh(Vector3f& translation);
+
+	void tetRead( const std::string& nodeFile, const std::string& faceFile, const std::string& eleFile, const std::string& objFile );
 
 private:
-	float gridCellSize;
-	float density;
-	float poissonsRatio;
-	float youngsModulus;
+	float gridResolution;
 };

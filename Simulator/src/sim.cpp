@@ -29,7 +29,7 @@ void Sim::init()
 			tetras->computeUndeformedVolume( i );
 			tetras->computeUndefVol_into_restInvDefTranspose( i );
 
-			tetras->addMass( i, 1000.0f, vertices );
+			tetras->addMass( i, vertices );
 		}
 	}
 }

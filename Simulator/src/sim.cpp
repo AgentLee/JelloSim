@@ -11,10 +11,10 @@ Sim::Sim( std::vector<std::shared_ptr<Mesh>>& MeshList ) : MeshList(MeshList)
 
 void Sim::init()
 {
-	for(uint i=0; i<MeshList.size(); i++)
+	for(uint j=0; j<MeshList.size(); j++)
 	{
-		std::shared_ptr<Tetrahedrons> tetras = MeshList[i]->tetras;
-		std::shared_ptr<Particles> vertices = MeshList[i]->vertices;
+		std::shared_ptr<Tetrahedrons> tetras = MeshList[j]->tetras;
+		std::shared_ptr<Particles> vertices = MeshList[j]->vertices;
 
 		// Precompute rest deformation (Dm), volume, inverse Dm, and volume*inverseDmTranspose for each tetrahedron
 		tetras->restDeformation.resize(tetras->numTetra);
@@ -36,9 +36,9 @@ void Sim::init()
 
 void Sim::clean()
 {
-	for(uint i=0; i<MeshList.size(); i++)
+	for(uint j=0; j<MeshList.size(); j++)
 	{
-		std::shared_ptr<Particles> vertices = MeshList[i]->vertices;
+		std::shared_ptr<Particles> vertices = MeshList[j]->vertices;
 		//Set forces for all vertices/particles to zero
 		for( int i=0; i < vertices->numParticles; i++ )
 		{
@@ -60,9 +60,9 @@ void Sim::eulerIntegration(float dt)
 
 void Sim::addExternalForces()
 {
-	for(uint i=0; i<MeshList.size(); i++)
+	for(uint j=0; j<MeshList.size(); j++)
 	{
-		std::shared_ptr<Particles> vertices = MeshList[i]->vertices;
+		std::shared_ptr<Particles> vertices = MeshList[j]->vertices;
 		
 		for(int i=0; i<vertices->numParticles; i++)
 		{
@@ -73,10 +73,10 @@ void Sim::addExternalForces()
 
 void Sim::computeElasticForces( int frame, bool &collided )
 {
-	for(uint i=0; i<MeshList.size(); i++)
+	for(uint j=0; j<MeshList.size(); j++)
 	{
-		std::shared_ptr<Tetrahedrons> tetras = MeshList[i]->tetras;
-		std::shared_ptr<Particles> vertices = MeshList[i]->vertices;
+		std::shared_ptr<Tetrahedrons> tetras = MeshList[j]->tetras;
+		std::shared_ptr<Particles> vertices = MeshList[j]->vertices;
 
 		// Loop through tetras
 		for(int tetraIndex=0; tetraIndex < tetras->numTetra; tetraIndex++)
@@ -137,10 +137,10 @@ void Sim::checkCollisions(float dt, bool &collided)
 	// If positive, particle didn't hit.
 	// If zero, particle on the surface.
 
-	for(uint i=0; i<MeshList.size(); i++)
+	for(uint j=0; j<MeshList.size(); j++)
 	{
-		std::shared_ptr<Tetrahedrons> tetras = MeshList[i]->tetras;
-		std::shared_ptr<Particles> vertices = MeshList[i]->vertices;
+		std::shared_ptr<Tetrahedrons> tetras = MeshList[j]->tetras;
+		std::shared_ptr<Particles> vertices = MeshList[j]->vertices;
 
 		for(int i = 0; i< vertices->numParticles; ++i)
 		{

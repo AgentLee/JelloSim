@@ -61,8 +61,7 @@ void createScene( std::vector<std::shared_ptr<Mesh>>& MeshList )
 		for(int i=0; i<cube2->vertices->numParticles; i++)
 		{
 			//move mesh up by 1m and reset mass to zero
-			cube2->vertices->pos[i](1) += 1.0f;
-			cube2->vertices->pos[i](0) += 3.0f;
+			cube2->vertices->pos[i](1) += 3.0f;
 			cube2->vertices->mass[i] = 0.0f;
 		}
 

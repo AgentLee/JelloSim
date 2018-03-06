@@ -130,13 +130,9 @@ void Sim::fixParticlePosition( Eigen::Matrix<T, 3, 1>& particleVel, Eigen::Matri
 
 void Sim::checkCollisions(float dt, bool &collided)
 {
-	// First do brute force SDF for primitives
-	// https://gamedev.stackexchange.com/questions/66636/what-are-distance-fields-and-how-are-they-applicable-to-collision-detection
-	// Transform the particles to the static mesh's local space
-	// If negative, particle went through the surface.
-	// If positive, particle didn't hit.
-	// If zero, particle on the surface.
-
+	//-------- First ---------------
+	// Check if any of the Meshes hit the ground or any other solid piece of geometry that is 
+	// essentially an infinite Mass Rigid Body that doesnt move
 	for(uint j=0; j<MeshList.size(); j++)
 	{
 		std::shared_ptr<Tetrahedrons> tetras = MeshList[j]->tetras;
@@ -156,6 +152,28 @@ void Sim::checkCollisions(float dt, bool &collided)
 			{
 				collided = true;
 				fixParticlePosition( vertices->vel[i], vertices->pos[i] );
+			}
+		}
+	}
+
+	//-------- Second ---------------
+	for(uint j=0; j<MeshList.size(); j++)
+	{
+		//Check if this mesh's AABB is intersecting with any other mesh's AABB
+		{
+			// Then do a brute force check, i.e loop through all vertice of one mesh 
+			// OR use a grid structure --> 
+			// and 
+			{
+				// for every vertex create a ray from the current position to its projected position in the next frame
+				// See if that ray intersects any triangle that Belongs to the other mesh.
+				// if it does
+				{
+					//resolve collisions
+					// move particle outside triangle
+					// or set its velocity in accordance to momentum equations
+					// or both of the above
+				}
 			}
 		}
 	}

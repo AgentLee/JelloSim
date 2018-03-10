@@ -15,6 +15,7 @@
 #include "particles.h"
 #include "mesh.h"
 #include "sdf.h"
+#include "triangles.h"
 
 using T = double;
 
@@ -37,4 +38,6 @@ public:
 	void fixParticlePosition( Eigen::Matrix<T, 3, 1>& particleVel, Eigen::Matrix<T, 3, 1>& particlePos );
 
 	void update(float dt, int frame, bool &collided);
+
+	int colliding(const Eigen::Matrix<T, 3, 1>& origPos, const Eigen::Matrix<T, 3, 1>& newPos, float *t);
 };

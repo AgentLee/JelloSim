@@ -1,3 +1,4 @@
+#pragma once
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
@@ -9,6 +10,6 @@ typedef Vector4f Point4f;
 
 struct Ray
 {
-	Point3f origin;
-	Point3f direction;
+    Eigen::Matrix<T, 3, 1> origin;
+    Eigen::Matrix<T, 3, 1> direction;
 };

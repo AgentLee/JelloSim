@@ -14,6 +14,7 @@
 #include <time.h>
 
 #include "particles.h"
+#include "globals.h"
 using namespace std;
 
 class Triangles
@@ -21,6 +22,7 @@ class Triangles
 public:
 	int numTriangles;
 	std::vector<Eigen::Matrix<uint, 3, 1>> triFaceList;
+	std::vector<Eigen::Matrix<T, 3, 1>> triNormalList;
 
 	Triangles();
 	void addTriangle(int i, int j, int k);
@@ -31,4 +33,6 @@ public:
 	//read tetgen face file
 	void tetgen_readLine(std::ifstream &fin);
 	void tetgen_readFace(const std::string &inputFileName);
+
+	bool intersect(const Ray &r, const int &triIndex, float *t, std::shared_ptr<Particles>& vertices) const;
 };

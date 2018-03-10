@@ -71,7 +71,7 @@ void Sim::addExternalForces()
 	}
 }
 
-void Sim::computeElasticForces( int frame, bool &collided )
+void Sim::computeElasticForces(int frame, bool &collided)
 {
 	for(uint j=0; j<MeshList.size(); j++)
 	{
@@ -102,9 +102,51 @@ void Sim::update(float dt, int frame, bool &collided)
     eulerIntegration(dt);
 }
 
-void Sim::fixParticlePosition( Eigen::Matrix<T, 3, 1>& particleVel, Eigen::Matrix<T, 3, 1>& particlePos )
+/*
+ * loop over all the triangles
+ * 	if normal is facing away,
+ * 		skip
+ * 	else
+ * 		find intersection
+ *
+ *	sort and get the closest intersection
+ */
+
+// TODO: Re-compute normals of faces
+// returns index of closest triangle on 2nd mesh.. -1 otherwise..
+// also sets t to dist of closest tri.. -1 otherwise..
+int Sim::colliding(const Eigen::Matrix<T, 3, 1>& origPos, const Eigen::Matrix<T, 3, 1>& newPos, float *t)
 {
-	if( SPRING_COLLISION )
+	// create ray and call triangle intersection for all triangles..
+	// store triangle reference
+
+	Ray r;
+	r.origin = origPos;
+	r.direction = Eigen::Matrix<T, 3, 1>(newPos - origPos);
+
+	// assuming only 2 meshes for now..
+	int tris = MeshList[1]->triangles->triFaceList.size();
+	*t = -1;
+	int closestTri = -1;
+	for(int i=0; i < tris; i++)
+	{
+		float tTemp = *t;
+		bool intersect = MeshList[1]->triangles->intersect(r, i, &tTemp, MeshList[1]->vertices);
+		if(intersect && *t > tTemp)
+		{
+			closestTri = i;
+			*t = tTemp;
+		}
+	}
+
+	return closestTri;
+}
+
+
+
+void Sim::fixParticlePosition(Eigen::Matrix<T, 3, 1>& particleVel, Eigen::Matrix<T, 3, 1>& particlePos)
+{
+	if(SPRING_COLLISION)
 	{
 		// // Apply zero length spring
 		// Eigen::Matrix<T, 3, 1> vSurf = p;
@@ -121,7 +163,7 @@ void Sim::fixParticlePosition( Eigen::Matrix<T, 3, 1>& particleVel, Eigen::Matri
 
 		// vertices->pos[i](0, 1) = 0.00001;
 
-		if( particleVel.dot(Eigen::Matrix<T, 3, 1>(0, 1, 0)) < 0 ) 
+		if(particleVel.dot(Eigen::Matrix<T, 3, 1>(0, 1, 0)) < 0)
 		{
 			particleVel = Eigen::Matrix<T, 3, 1>::Zero();
 		}

@@ -71,3 +71,48 @@ void Triangles::tetgen_readFace(const std::string &inputFileName)
         fin.close();
     }
 }
+
+float length(const Eigen::Matrix<T, 3, 1> &v)
+{
+    return v.norm();
+}
+
+Eigen::Matrix<T, 3, 1> cross(const Eigen::Matrix<T, 3, 1> &a, const Eigen::Matrix<T, 3, 1> &b)
+{
+    return a.cross(b);
+}
+
+bool fequal(float a, float b)
+{
+    return (a < b + 0.001) && (a > b - 0.001);
+}
+
+//The ray in this function is not transformed because it was *already* transformed in Mesh::GetIntersection
+bool Triangles::intersect(const Ray &r, const int &triIndex, float *t, std::shared_ptr<Particles>& vertices) const
+{
+    Eigen::Matrix<T, 3, 1> planeNormal = triNormalList[triIndex];
+    std::vector<Eigen::Matrix<T, 3, 1>> points;
+    points[0] = vertices->pos[triFaceList[triIndex][0]];
+    points[1] = vertices->pos[triFaceList[triIndex][1]];
+    points[2] = vertices->pos[triFaceList[triIndex][2]];
+
+    //1. Ray-plane intersection
+    float tnew =  planeNormal.dot(points[0] - r.origin) / planeNormal.dot(r.direction);
+    if(tnew < 0.f) return false;
+
+    Eigen::Matrix<T, 3, 1> P = r.origin + tnew * r.direction;
+    //2. Barycentric test
+
+    float S = 0.5f * length(cross(points[0] - points[1], points[0] - points[2]));
+    float s1 = 0.5f * length(cross(P - points[1], P - points[2]))/S;
+    float s2 = 0.5f * length(cross(P - points[2], P - points[0]))/S;
+    float s3 = 0.5f * length(cross(P - points[0], P - points[1]))/S;
+    float sum = s1 + s2 + s3;
+
+    if(s1 >= 0 && s1 <= 1 && s2 >= 0 && s2 <= 1 && s3 >= 0 && s3 <= 1 && fequal(sum, 1.0f)) {
+        *t = tnew;
+        return true;
+    }
+
+    return false;
+}

@@ -31,15 +31,18 @@ public:
 	void clean();
 	
 	void eulerIntegration(float dt);
-	void checkCollisions(float dt, bool &collided);
+	void eulerIntegrationWithCollisionTesting(float dt, bool& collided);
+	void checkCollisions(float dt, uint j, bool& collided);
 
 	void addExternalForces();
 	void computeElasticForces( int frame, bool &collided );
 
 	void fixParticlePosition( Eigen::Matrix<T, 3, 1>& particleVel, Eigen::Matrix<T, 3, 1>& particlePos );
-	void resolveCollisions( std::shared_ptr<Triangles>& triangles, Intersection& isect, Eigen::Matrix<T, 3, 1>& particlePos );
+	void resolveCollisions( std::shared_ptr<Triangles>& triangles, std::shared_ptr<Particles>& vertices, 
+							Intersection& isect, Eigen::Matrix<T, 3, 1>& displacement,
+							Eigen::Matrix<T, 3, 1>& particlePos, Eigen::Matrix<T, 3, 1>& particleVel );
 
 	void update(float dt, int frame, bool &collided);
 
-	int colliding(const Eigen::Matrix<T, 3, 1>& origPos, const Eigen::Matrix<T, 3, 1>& newPos, float *t);
+    bool LineTriangleIntersection(const Eigen::Matrix<T, 3, 1>& origPos, const Eigen::Matrix<T, 3, 1>& newPos, Intersection *isect);
 };

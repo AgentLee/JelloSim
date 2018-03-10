@@ -58,7 +58,7 @@ Bounds Bounds::ApplyTransform(const Matrix4f& T)
     return b;
 }
 
-bool Bounds::Intersect(const Ray& r , float* t) const
+bool Bounds::Intersect(const Ray& r, float* t) const
 {
     float t_n = -std::numeric_limits<T>::infinity();
     float t_f =  std::numeric_limits<T>::infinity();
@@ -120,6 +120,13 @@ bool Bounds::Intersect(const Ray& r , float* t) const
 
     //If t_near was greater than t_far, we did not hit the cube
     return false;
+}
+
+bool Intersect_AABB_with_AABB(const Bounds& a, const Bounds& b)
+{
+  return ( a.min[0] <= b.max[0] && a.max[0] >= b.min[0] ) &&
+         ( a.min[1] <= b.max[1] && a.max[1] >= b.min[1] ) &&
+         ( a.min[2] <= b.max[2] && a.max[2] >= b.min[2] );
 }
 
 Bounds Union(const Bounds& b1, const Bounds& b2)

@@ -44,6 +44,7 @@ public:
 	bool Contains(const Vector3f& pos);
 };
 
+bool Intersect_AABB_with_AABB(const Bounds& a, const Bounds& b);
 Bounds Union(const Bounds& b1, const Bounds& b2);
 Bounds Union(const Bounds& b1, const Point3f& p);
 Bounds Union(const Bounds& b1, const Point4f& p);

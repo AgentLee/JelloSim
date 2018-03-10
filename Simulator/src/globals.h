@@ -12,3 +12,12 @@ struct Ray
 	Point3f origin;
 	Point3f direction;
 };
+
+struct Intersection
+{
+	bool hit;
+	float t;
+	uint triangleIndex;
+	Point3f point;
+	Point3f normal;
+};

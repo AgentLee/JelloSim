@@ -14,6 +14,7 @@
 #include "tetrahedrons.h"
 #include "particles.h"
 #include "mesh.h"
+#include "bounds.h"
 #include "sdf.h"
 #include "triangles.h"
 
@@ -36,6 +37,7 @@ public:
 	void computeElasticForces( int frame, bool &collided );
 
 	void fixParticlePosition( Eigen::Matrix<T, 3, 1>& particleVel, Eigen::Matrix<T, 3, 1>& particlePos );
+	void resolveCollisions( std::shared_ptr<Triangles>& triangles, Intersection& isect, Eigen::Matrix<T, 3, 1>& particlePos );
 
 	void update(float dt, int frame, bool &collided);
 

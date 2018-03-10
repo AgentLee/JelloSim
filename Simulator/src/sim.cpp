@@ -170,6 +170,15 @@ void Sim::fixParticlePosition(Eigen::Matrix<T, 3, 1>& particleVel, Eigen::Matrix
 	}
 }
 
+void Sim::resolveCollisions( std::shared_ptr<Triangles>& triangles, Intersection& isect, Eigen::Matrix<T, 3, 1>& particlePos )
+{
+	// move particle outside triangle
+	// or set its velocity in accordance to momentum equations
+	// or both of the above
+
+
+}
+
 void Sim::checkCollisions(float dt, bool &collided)
 {
 	//-------- First ---------------
@@ -202,19 +211,31 @@ void Sim::checkCollisions(float dt, bool &collided)
 	for(uint j=0; j<MeshList.size(); j++)
 	{
 		//Check if this mesh's AABB is intersecting with any other mesh's AABB
+		for(uint i=0; i<MeshList.size() && i!=j; i++)
 		{
-			// Then do a brute force check, i.e loop through all vertice of one mesh 
-			// OR use a grid structure --> 
-			// and 
+			bool intersects = Intersect_AABB_with_AABB( MeshList[j]->AABB, MeshList[i]->AABB );
+			
+			if(intersects)
 			{
-				// for every vertex create a ray from the current position to its projected position in the next frame
-				// See if that ray intersects any triangle that Belongs to the other mesh.
-				// if it does
+				std::shared_ptr<Particles> vertices = MeshList[j]->vertices;
+				// Then do a brute force check, i.e loop through all vertice of one mesh 
+				// OR use a grid structure or cull the triangles somehow
+				
+				for(int i = 0; i< vertices->numParticles; ++i)
 				{
-					//resolve collisions
-					// move particle outside triangle
-					// or set its velocity in accordance to momentum equations
-					// or both of the above
+					std::shared_ptr<Triangles> triangles = MeshList[j]->triangles;
+
+					// for every vertex create a ray from the current position to its projected position in the next frame
+					// See if that ray intersects any triangle that Belongs to the other mesh.
+
+					//Eigen::Matrix<T, 3, 1> projectedPos = vertices->pos[i] + vertices->vel[i] * dt;
+					Intersection isect;// = LineTriangleIntersection(triangles, vertices->pos[i], projectedPos);
+
+					if(isect.hit)
+					{
+						//resolve collisions between vertex and a triangle
+						resolveCollisions( triangles, isect, vertices->pos[i] );
+					}
 				}
 			}
 		}

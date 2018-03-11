@@ -29,6 +29,8 @@ public:
 
 	void init();
 	void clean();
+
+	void computeNormals();
 	
 	void eulerIntegration(float dt);
 	void eulerIntegrationWithCollisionTesting(float dt);

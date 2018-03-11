@@ -18,7 +18,7 @@
 using T = double;
 
 constexpr int beginFrame = 2; //1 is initial state that is written separately
-constexpr int endFrame = 70;
+constexpr int endFrame = 120;
 constexpr int numSimulationStepsPerFrame = 300;
 constexpr float dt = 1e-4;
 constexpr float density = 1000.f;
@@ -39,7 +39,7 @@ const std::string bgeoFileNames[] = { "../Assets/BGEOs/jelloCube1Frame",
 void createScene( std::vector<std::shared_ptr<Mesh>>& MeshList )
 {
 	const float gridCellSize = 1.0f;
-	Vector3f translation = Vector3f(0.0f, 1.0f, 0.0f);
+	Vector3f translation = Vector3f(0.0f, 2.0f, 0.0f);
 
 	{
 		std::shared_ptr<Mesh> cube1 = std::make_shared<Mesh>( nodeFileNames[0], faceFileNames[0], 
@@ -50,7 +50,7 @@ void createScene( std::vector<std::shared_ptr<Mesh>>& MeshList )
 	}
 
 	{
-		translation = Vector3f(3.0f, 3.0f, 0.0f);
+		translation = Vector3f(0.0f, 0.0f, 0.0f);
 		std::shared_ptr<Mesh> cube2 = std::make_shared<Mesh>( nodeFileNames[1], faceFileNames[1], 
 															eleFileNames[1], objFileNames[1], gridCellSize, 
 															density, poissonsRatio, youngsModulus );

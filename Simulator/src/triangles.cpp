@@ -10,7 +10,6 @@ void Triangles::addTriangle(int i, int j, int k)
 	numTriangles++;
 }
 
-
 void Triangles::create_objFile(std::string file_name, std::shared_ptr<Particles>& vertices )
 {
     ofstream objfile;

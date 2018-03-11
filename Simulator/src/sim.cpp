@@ -5,6 +5,9 @@
 #include "sim.h"
 
 #define SPRING_COLLISION 0
+#define SET_POSITIONS 1
+#define SET_VELOCITIES 0
+#define PAPER 0
 
 Sim::Sim( std::vector<std::shared_ptr<Mesh>>& MeshList ) : MeshList(MeshList)
 {}
@@ -58,6 +61,21 @@ void Sim::eulerIntegration(float dt)
 	}
 }
 
+void Sim::eulerIntegrationWithCollisionTesting(float dt, bool& collided)
+{
+	for(uint i=0; i<MeshList.size(); i++)
+	{
+		std::shared_ptr<Particles> vertices = MeshList[i]->vertices;
+		checkCollisions(dt, i, collided); //Apply Forces to particles that occur through collision
+		
+		if(collided)
+		{
+			vertices->updateParticleVelocity(dt);
+			vertices->updateParticlePositions(dt);
+		}
+	}
+}
+
 void Sim::addExternalForces()
 {
 	for(uint j=0; j<MeshList.size(); j++)
@@ -71,7 +89,7 @@ void Sim::addExternalForces()
 	}
 }
 
-void Sim::computeElasticForces( int frame, bool &collided )
+void Sim::computeElasticForces( int frame, bool& collided )
 {
 	for(uint j=0; j<MeshList.size(); j++)
 	{
@@ -91,15 +109,14 @@ void Sim::computeElasticForces( int frame, bool &collided )
 	}
 }
 
-void Sim::update(float dt, int frame, bool &collided)
+void Sim::update(float dt, int frame, bool& collided)
 {
 	clean(); //clears forces
-    checkCollisions(dt, collided); //Apply Forces to particles that occur through collision
 
     addExternalForces();
 	computeElasticForces(frame, collided); //computes and adds elastic forces to each particle
 
-    eulerIntegration(dt);
+    eulerIntegrationWithCollisionTesting(dt, collided);
 }
 
 void Sim::fixParticlePosition( Eigen::Matrix<T, 3, 1>& particleVel, Eigen::Matrix<T, 3, 1>& particlePos )
@@ -128,72 +145,94 @@ void Sim::fixParticlePosition( Eigen::Matrix<T, 3, 1>& particleVel, Eigen::Matri
 	}
 }
 
-void Sim::resolveCollisions( std::shared_ptr<Triangles>& triangles, Intersection& isect, Eigen::Matrix<T, 3, 1>& particlePos )
+void Sim::resolveCollisions( std::shared_ptr<Triangles>& triangles, std::shared_ptr<Particles>& vertices, 
+	Intersection& isect, Eigen::Matrix<T, 3, 1>& displacement,
+	Eigen::Matrix<T, 3, 1>& particlePos, Eigen::Matrix<T, 3, 1>& particleVel )
 {
-	// move particle outside triangle
-	// or set its velocity in accordance to momentum equations
-	// or both of the above
+	// NOTE: triangles and vertices corresspond to the Triangles and Vertices of the other Mesh
 
+	// set position or velocity or both OR use momentum OR use paper's implementation with normal reaction forces and friction
+	Eigen::Matrix<uint, 3, 1> verticesOfTriangle = triangles->triFaceList[isect.triangleIndex];
 
+	if(SET_POSITIONS)
+	{
+		//---------------- Setting Positions ---------------------------------
+		particlePos = isect.point.cast<T>() - 0.25f*displacement; // 1/4th to moving vertex
+		displacement = 0.75f*displacement;				// 3/4th to moving triangle
+
+		// move vertices of triangle according to barycentric weights
+		vertices->pos[verticesOfTriangle[0]] += isect.BarycentricWeights[0] * displacement;
+		vertices->pos[verticesOfTriangle[1]] += isect.BarycentricWeights[1] * displacement;
+		vertices->pos[verticesOfTriangle[2]] += isect.BarycentricWeights[2] * displacement;
+	}
+	if(SET_VELOCITIES)
+	{
+		particleVel = Eigen::Matrix<T, 3, 1>::Zero();
+
+		vertices->vel[verticesOfTriangle[0]] = Eigen::Matrix<T, 3, 1>::Zero();
+		vertices->vel[verticesOfTriangle[1]] = Eigen::Matrix<T, 3, 1>::Zero();
+		vertices->vel[verticesOfTriangle[2]] = Eigen::Matrix<T, 3, 1>::Zero();
+	}
+	if(PAPER)
+	{
+	}
 }
 
-void Sim::checkCollisions(float dt, bool &collided)
+void Sim::checkCollisions(float dt, uint j, bool& collided)
 {
 	//-------- First ---------------
 	// Check if any of the Meshes hit the ground or any other solid piece of geometry that is 
 	// essentially an infinite Mass Rigid Body that doesnt move
-	for(uint j=0; j<MeshList.size(); j++)
+	std::shared_ptr<Tetrahedrons> tetras = MeshList[j]->tetras;
+	std::shared_ptr<Particles> vertices = MeshList[j]->vertices;
+
+	for(int i = 0; i< vertices->numParticles; ++i)
 	{
-		std::shared_ptr<Tetrahedrons> tetras = MeshList[j]->tetras;
-		std::shared_ptr<Particles> vertices = MeshList[j]->vertices;
+		Eigen::Matrix<T, 3, 1> p(vertices->pos[i]);
 
-		for(int i = 0; i< vertices->numParticles; ++i)
+		// Transform the vertex to the plane's local space
+		// Assume the plane is at the origin
+		Eigen::Matrix<T, 4, 1> n = Eigen::Matrix<T, 4, 1>(0, 1, 0, 0);
+		float sdf = SDF::sdPlane(p, n);
+
+		// Check if particle went through the surface
+		if(sdf < 0) 
 		{
-			Eigen::Matrix<T, 3, 1> p(vertices->pos[i]);
-
-			// Transform the vertex to the plane's local space
-			// Assume the plane is at the origin
-			Eigen::Matrix<T, 4, 1> n = Eigen::Matrix<T, 4, 1>(0, 1, 0, 0);
-			float sdf = SDF::sdPlane(p, n);
-
-			// Check if particle went through the surface
-			if(sdf < 0) 
-			{
-				collided = true;
-				fixParticlePosition( vertices->vel[i], vertices->pos[i] );
-			}
+			collided = true;
+			fixParticlePosition( vertices->vel[i], vertices->pos[i] );
 		}
 	}
 
 	//-------- Second ---------------
-	for(uint j=0; j<MeshList.size(); j++)
+	//Check if this mesh's AABB is intersecting with any other mesh's AABB
+	for(uint i=0; i<MeshList.size() && i!=j; i++)
 	{
-		//Check if this mesh's AABB is intersecting with any other mesh's AABB
-		for(uint i=0; i<MeshList.size() && i!=j; i++)
+		bool intersects = Intersect_AABB_with_AABB( MeshList[j]->AABB, MeshList[i]->AABB );
+		
+		if(intersects)
 		{
-			bool intersects = Intersect_AABB_with_AABB( MeshList[j]->AABB, MeshList[i]->AABB );
+			std::shared_ptr<Particles> vertices = MeshList[j]->vertices;
+			// Then do a brute force check, i.e loop through all vertice of one mesh 
+			// OR use a grid structure or cull the triangles somehow
 			
-			if(intersects)
+			for(int k = 0; k< vertices->numParticles; ++k)
 			{
-				std::shared_ptr<Particles> vertices = MeshList[j]->vertices;
-				// Then do a brute force check, i.e loop through all vertice of one mesh 
-				// OR use a grid structure or cull the triangles somehow
-				
-				for(int i = 0; i< vertices->numParticles; ++i)
+				std::shared_ptr<Triangles> triangles = MeshList[j]->triangles;
+
+				// for every vertex create a ray from the current position to its projected position in the next frame
+				// See if that ray intersects any triangle that Belongs to the other mesh.
+
+				Eigen::Matrix<T, 3, 1> projectedPos = vertices->pos[k] + vertices->vel[k] * dt;
+				Intersection isect;// = LineTriangleIntersection(triangles, vertices->pos[k], projectedPos);
+
+				if(isect.hit)
 				{
-					std::shared_ptr<Triangles> triangles = MeshList[j]->triangles;
+					//resolve collisions between vertex and a triangle
+					Eigen::Matrix<T, 3, 1> displscement = projectedPos - vertices->pos[i];
 
-					// for every vertex create a ray from the current position to its projected position in the next frame
-					// See if that ray intersects any triangle that Belongs to the other mesh.
-
-					//Eigen::Matrix<T, 3, 1> projectedPos = vertices->pos[i] + vertices->vel[i] * dt;
-					Intersection isect;// = LineTriangleIntersection(triangles, vertices->pos[i], projectedPos);
-
-					if(isect.hit)
-					{
-						//resolve collisions between vertex and a triangle
-						resolveCollisions( triangles, isect, vertices->pos[i] );
-					}
+					resolveCollisions( MeshList[i]->triangles, MeshList[i]->vertices, isect, displscement, 
+									vertices->pos[k], vertices->vel[k] );
+					collided = true;
 				}
 			}
 		}

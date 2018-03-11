@@ -20,4 +20,5 @@ struct Intersection
 	uint triangleIndex;
 	Point3f point;
 	Point3f normal;
+	Point3f BarycentricWeights;// Corresponding to every point that makes the triangle
 };

@@ -4,10 +4,10 @@
 
 #include "sim.h"
 
-#define SPRING_COLLISION 0
 #define SET_POSITIONS 1
 #define SET_VELOCITIES 0
 #define PAPER 0
+#define INTER_OBJECT_COLLISIONS 1
 
 Sim::Sim( std::vector<std::shared_ptr<Mesh>>& MeshList ) : MeshList(MeshList)
 {}
@@ -58,8 +58,8 @@ void Sim::eulerIntegration(float dt)
 {
 	for(uint i=0; i<MeshList.size(); i++)
 	{
+        SDF_Collisions(dt, i);
 		std::shared_ptr<Particles> vertices = MeshList[i]->vertices;
-
 		vertices->updateAllParticleVelocities(dt);
 		vertices->updateAllParticlePositions(dt);
 	}
@@ -148,8 +148,11 @@ void Sim::update(float dt, int frame)
 
     addExternalForces();
 	computeElasticForces(frame); //computes and adds elastic forces to each particle
-
+#if INTER_OBJECT_COLLISIONS
     eulerIntegrationWithCollisionTesting(dt);
+#else
+    eulerIntegration(dt);
+#endif
 }
 
 void Sim::reComputeMeshAttributes()

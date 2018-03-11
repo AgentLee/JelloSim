@@ -7,6 +7,7 @@ void Triangles::addTriangle(int i, int j, int k)
 {
 	Eigen::Matrix<uint, 3, 1> tri = {uint(i),uint(j),uint(k)};
 	triFaceList.push_back(tri);
+    triNormalList.push_back(Eigen::Matrix<T, 3, 1>::Zero());
 	numTriangles++;
 }
 
@@ -90,7 +91,7 @@ void Triangles::computeNormals(std::shared_ptr<Particles>& vertices)
 {
     for(int i=0; i<numTriangles; i++)
     {
-        std::vector<Eigen::Matrix<T, 3, 1>> points;
+        Eigen::Matrix<T, 3, 1> points[3];
         points[0] = vertices->pos[triFaceList[i][0]];
         points[1] = vertices->pos[triFaceList[i][1]];
         points[2] = vertices->pos[triFaceList[i][2]];
@@ -98,7 +99,7 @@ void Triangles::computeNormals(std::shared_ptr<Particles>& vertices)
         Eigen::Matrix<T, 3, 1> vec1 = points[1] - points[0];
         Eigen::Matrix<T, 3, 1> vec2 = points[2] - points[1];
 
-        triNormalList[i] = vec1.cross(vec2);
+        triNormalList[i] = cross(vec1, vec2);
     }
 }
 

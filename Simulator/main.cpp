@@ -15,7 +15,7 @@
 #include "src/utilities.h"
 #include "src/sim.h"
 
-#define CONVERT_OBJ_TO_POLY
+//#define CONVERT_OBJ_TO_POLY
 
 using T = double;
 

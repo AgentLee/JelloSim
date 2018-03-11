@@ -137,11 +137,20 @@ void Sim::computeElasticForces( int frame )
 void Sim::update(float dt, int frame)
 {
 	clean(); //clears forces
+	computeNormals(); //compute triangle normals for all meshes
 
     addExternalForces();
 	computeElasticForces(frame); //computes and adds elastic forces to each particle
 
     eulerIntegrationWithCollisionTesting(dt);
+}
+
+void Sim::computeNormals()
+{
+	for(uint j=0; j<MeshList.size(); j++)
+	{
+		MeshList[j]->triangles->computeNormals(MeshList[j]->vertices);
+	}
 }
 
 // returns index of closest triangle on 2nd mesh.. -1 otherwise..

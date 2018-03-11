@@ -86,6 +86,22 @@ bool fequal(float a, float b)
     return (a < b + 0.001) && (a > b - 0.001);
 }
 
+void Triangles::computeNormals(std::shared_ptr<Particles>& vertices)
+{
+    for(int i=0; i<numTriangles; i++)
+    {
+        std::vector<Eigen::Matrix<T, 3, 1>> points;
+        points[0] = vertices->pos[triFaceList[i][0]];
+        points[1] = vertices->pos[triFaceList[i][1]];
+        points[2] = vertices->pos[triFaceList[i][2]];
+
+        Eigen::Matrix<T, 3, 1> vec1 = points[1] - points[0];
+        Eigen::Matrix<T, 3, 1> vec2 = points[2] - points[1];
+
+        triNormalList[i] = vec1.cross(vec2);
+    }
+}
+
 //The ray in this function is not transformed because it was *already* transformed in Mesh::GetIntersection
 bool Triangles::intersect(const Ray &r, const int &triIndex, float *t, std::shared_ptr<Particles>& vertices, Eigen::Matrix<T, 3, 1> *baryCoords) const
 {

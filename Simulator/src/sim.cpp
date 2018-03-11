@@ -63,10 +63,11 @@ void Sim::eulerIntegration(float dt)
 
 void Sim::eulerIntegrationWithCollisionTesting(float dt, bool& collided)
 {
+    checkCollisions(dt, 0, collided); //Apply Forces to particles that occur through collision
+
 	for(uint i=0; i<MeshList.size(); i++)
 	{
 		std::shared_ptr<Particles> vertices = MeshList[i]->vertices;
-		checkCollisions(dt, i, collided); //Apply Forces to particles that occur through collision
 		
 		if(collided)
 		{

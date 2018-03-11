@@ -34,5 +34,7 @@ public:
 	void tetgen_readLine(std::ifstream &fin);
 	void tetgen_readFace(const std::string &inputFileName);
 
+    void computeNormals(std::shared_ptr<Particles>& vertices);
+
 	bool intersect(const Ray &r, const int &triIndex, float *t, std::shared_ptr<Particles>& vertices, Eigen::Matrix<T, 3, 1> *baryCoords) const;
 };

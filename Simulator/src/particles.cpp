@@ -22,7 +22,7 @@ Particles::Particles(int n, T initialMass): numParticles(n)
  * Using sympledic Euler to update speed and velocity based on 
  * the force, mass and previous state
  */
-void Particles::updateParticlePositions(T dt)
+void Particles::updateAllParticlePositions(T dt)
 {
     for(int i=0; i<numParticles; i++)
     {
@@ -30,7 +30,7 @@ void Particles::updateParticlePositions(T dt)
     }
 }
 
-void Particles::updateParticleVelocity(T dt)
+void Particles::updateAllParticleVelocities(T dt)
 {
     for(int i=0; i<numParticles; i++)
     {
@@ -38,7 +38,15 @@ void Particles::updateParticleVelocity(T dt)
     }
 }
 
+void Particles::updateParticlePosition(T dt, uint index)
+{
+    pos[index] += vel[index] * dt;
+}
 
+void Particles::updateParticleVelocity(T dt, uint index)
+{
+    vel[index] += force[index] / mass[index] * dt;
+}
 
 /*
  *  .node FILE FORMAT:

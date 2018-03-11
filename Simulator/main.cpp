@@ -84,8 +84,6 @@ int main(int argc, char* argv[])
 	std::shared_ptr<Sim> sim = std::make_shared<Sim>( MeshList );
 	sim->init();
 
-	bool collided = false;
-
 	std::cout << "Num Meshes " << MeshList.size() << std::endl;
 
 	//Main Loop of Jello Sim
@@ -93,7 +91,7 @@ int main(int argc, char* argv[])
 	{
 		for( int j = 0; j <= numSimulationStepsPerFrame; j++ )
 		{
-			sim->update(dt, i, collided);
+			sim->update(dt, i);
 		}
 
 		writeBGEOsforMeshes( MeshList, i );

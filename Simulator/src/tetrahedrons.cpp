@@ -98,7 +98,7 @@ Eigen::Matrix<T, 3, 3> jInvTrMat(const Eigen::Matrix<T,3,3>& mat)
     return retMat;
 }
 
-Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Matrix<T,3,3>& F, int frame, bool &collided )
+Eigen::Matrix<T, 3, 3> Tetrahedrons::computeP( uint tetraIndex, const Eigen::Matrix<T,3,3>& F, int frame )
 {
     // ensure poissons ratio is always less than 0.5 otherwise things become infinity
     // mu = k / (2 * (1 + poisson ratio))

@@ -25,8 +25,10 @@ public:
 	std::vector<Eigen::Matrix<T, 3, 1>> force;
 
 	Particles(int n, T initialMass);
-	void updateParticlePositions(T dt);
-	void updateParticleVelocity(T dt);
+	void updateAllParticlePositions(T dt);
+	void updateAllParticleVelocities(T dt);
+	void updateParticlePosition(T dt, uint index);
+	void updateParticleVelocity(T dt, uint index);
 
 	// Reads Tetgen file and stores data
 	void tetgen_readLine(std::ifstream &fin, int numDims, int numAtt);

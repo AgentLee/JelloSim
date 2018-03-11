@@ -87,7 +87,7 @@ bool fequal(float a, float b)
 }
 
 //The ray in this function is not transformed because it was *already* transformed in Mesh::GetIntersection
-bool Triangles::intersect(const Ray &r, const int &triIndex, float *t, std::shared_ptr<Particles>& vertices) const
+bool Triangles::intersect(const Ray &r, const int &triIndex, float *t, std::shared_ptr<Particles>& vertices, Eigen::Matrix<T, 3, 1> *baryCoords) const
 {
     Eigen::Matrix<T, 3, 1> planeNormal = triNormalList[triIndex];
     std::vector<Eigen::Matrix<T, 3, 1>> points;
@@ -110,6 +110,7 @@ bool Triangles::intersect(const Ray &r, const int &triIndex, float *t, std::shar
 
     if(s1 >= 0 && s1 <= 1 && s2 >= 0 && s2 <= 1 && s3 >= 0 && s3 <= 1 && fequal(sum, 1.0f)) {
         *t = tnew;
+        (*baryCoords) << s1 , s2, s3;
         return true;
     }
 

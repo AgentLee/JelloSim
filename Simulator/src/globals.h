@@ -19,7 +19,7 @@ struct Intersection
 	bool hit;
 	float t;
 	uint triangleIndex;
-	Point3f point;
-	Point3f normal;
-	Point3f BarycentricWeights;// Corresponding to every point that makes the triangle
+    Eigen::Matrix<T, 3, 1> point;
+    Eigen::Matrix<T, 3, 1> normal;
+    Eigen::Matrix<T, 3, 1> BarycentricWeights;// Corresponding to every point that makes the triangle
 };

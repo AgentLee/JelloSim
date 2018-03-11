@@ -132,6 +132,8 @@ bool Sim::LineTriangleIntersection(const Eigen::Matrix<T, 3, 1>& origPos, const 
 	Ray r;
 	r.origin = origPos;
 	r.direction = Eigen::Matrix<T, 3, 1>(newPos - origPos);
+    float length = r.direction.norm();
+    r.direction.normalize();
 
 	// assuming only 2 meshes for now..
 	int tris = MeshList[1]->triangles->triFaceList.size();
@@ -140,12 +142,16 @@ bool Sim::LineTriangleIntersection(const Eigen::Matrix<T, 3, 1>& origPos, const 
 	for(int i=0; i < tris; i++)
 	{
 		float tTemp = isect->t;
-		bool intersect = MeshList[1]->triangles->intersect(r, i, &tTemp, MeshList[1]->vertices);
-		if(intersect && isect->t > tTemp)
+        Eigen::Matrix<T, 3, 1> baryCoords;
+		bool intersect = MeshList[1]->triangles->intersect(r, i, &tTemp, MeshList[1]->vertices, &baryCoords);
+		if(intersect && isect->t > tTemp && tTemp <= length)
         {
             isect->hit = true;
             isect->triangleIndex = i;
             isect->t = tTemp;
+            isect->BarycentricWeights = baryCoords;
+            isect->normal = MeshList[1]->triangles->triNormalList[i];
+            isect->point = r.origin + tTemp * r.direction;
 		}
 	}
 

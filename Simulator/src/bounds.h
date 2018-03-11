@@ -41,7 +41,7 @@ public:
 	Bounds ApplyTransform(const Matrix4f& tr);
 
 	bool Intersect(const Ray& r , float* t) const;
-	bool Contains(const Vector3f& pos);
+	bool Contains(const Vector3f& pos) const;
 };
 
 bool Intersect_AABB_with_AABB(const Bounds& a, const Bounds& b);

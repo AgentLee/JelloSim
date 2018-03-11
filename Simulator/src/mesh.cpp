@@ -57,6 +57,10 @@ void Mesh::translateMesh(Vector3f& translation)
 void Mesh::calcBounds()
 {
 	//loop over vertices to identify the Bounding Box
+    double inf = std::numeric_limits<T>::infinity();
+    AABB.min << inf, inf, inf;
+    AABB.max << -inf, -inf, -inf;
+
 	for(int i=0; i<vertices->numParticles; i++)
 	{
 		Point3f pos = vertices->pos[i].cast<float>();
@@ -64,9 +68,9 @@ void Mesh::calcBounds()
 	}
 }
 
-void Mesh::updateBounds()
+void Mesh::updateBounds(const Bounds &newAABB)
 {
-
+	//AABB.min = std
 }
 
 void Mesh::initializeGrid()

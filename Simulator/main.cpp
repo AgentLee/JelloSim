@@ -27,15 +27,15 @@ constexpr float density = 1000.f;
 constexpr float youngsModulus = 500000.0f;
 constexpr float poissonsRatio = 0.3f;
 
-const std::string nodeFileNames[] = { "../Assets/Meshes/teapotURN_0.1/teapotURN.1.node",
+const std::string nodeFileNames[] = { "../Assets/Meshes/cube_poly_0.001/cube.1.node",
 									  "../Assets/Meshes/cube_poly_0.001/cube.1.node" };
-const std::string faceFileNames[] = { "../Assets/Meshes/teapotURN_0.1/teapotURN.1.face",
+const std::string faceFileNames[] = { "../Assets/Meshes/cube_poly_0.001/cube.1.face",
 									  "../Assets/Meshes/cube_poly_0.001/cube.1.face" };
-const std::string eleFileNames[]  = { "../Assets/Meshes/teapotURN_0.1/teapotURN.1.ele",
+const std::string eleFileNames[]  = { "../Assets/Meshes/cube_poly_0.001/cube.1.ele",
 									  "../Assets/Meshes/cube_poly_0.001/cube.1.ele"};
-const std::string objFileNames[]  = { "../Assets/OBJs/FirstJar.obj",
+const std::string objFileNames[]  = { "../Assets/OBJs/FirstCube.obj",
 									  "../Assets/OBJs/SecondCube.obj" };
-const std::string bgeoFileNames[] = { "../Assets/BGEOs/jelloJar1Frame",
+const std::string bgeoFileNames[] = { "../Assets/BGEOs/jelloCube1Frame",
 									  "../Assets/BGEOs/jelloCube2Frame" };
 
 const std::string objToPolyNames[] = { "../Assets/objs_polys/teapotURN.obj",
@@ -44,7 +44,7 @@ const std::string objToPolyNames[] = { "../Assets/objs_polys/teapotURN.obj",
 void createScene( std::vector<std::shared_ptr<Mesh>>& MeshList )
 {
 	const float gridCellSize = 1.0f;
-	Vector3f translation = Vector3f(0.0f, 2.0f, 0.0f);
+	Vector3f translation = Vector3f(0.0f, 1.5f, 0.0f);
 
 	{
 		std::shared_ptr<Mesh> cube1 = std::make_shared<Mesh>( nodeFileNames[0], faceFileNames[0], 

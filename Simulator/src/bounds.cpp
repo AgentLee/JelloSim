@@ -1,6 +1,6 @@
 #include "bounds.h"
 
-bool Bounds::Contains(const Vector3f& pos)
+bool Bounds::Contains(const Vector3f& pos) const
 {
     if( ( pos[0] > min[0] && pos[1] > min[1] && pos[2] > min[2] ) &&
         ( pos[0] < max[0] && pos[1] < max[1] && pos[2] < max[2] ) )
@@ -124,9 +124,24 @@ bool Bounds::Intersect(const Ray& r, float* t) const
 
 bool Intersect_AABB_with_AABB(const Bounds& a, const Bounds& b)
 {
-  return ( a.min[0] <= b.max[0] && a.max[0] >= b.min[0] ) &&
-         ( a.min[1] <= b.max[1] && a.max[1] >= b.min[1] ) &&
-         ( a.min[2] <= b.max[2] && a.max[2] >= b.min[2] );
+    std::vector<Point3f> c(8);
+    c[0] << b.min[0], b.min[1], b.min[2];
+    c[1] << b.min[0], b.min[1], b.max[2];
+    c[2] << b.min[0], b.max[1], b.min[2];
+    c[3] << b.min[0], b.max[1], b.max[2];
+    c[4] << b.max[0], b.min[1], b.min[2];
+    c[5] << b.max[0], b.min[1], b.max[2];
+    c[6] << b.max[0], b.max[1], b.min[2];
+    c[7] << b.max[0], b.max[1], b.max[2];
+
+    for(int i=0; i<8; i++) {
+        if(a.Contains(c[i]))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 Bounds Union(const Bounds& b1, const Bounds& b2)

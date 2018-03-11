@@ -30,7 +30,7 @@ public:
 	void init();
 	void clean();
 
-	void computeNormals();
+	void reComputeMeshAttributes();
 	
 	void eulerIntegration(float dt);
 	void eulerIntegrationWithCollisionTesting(float dt);

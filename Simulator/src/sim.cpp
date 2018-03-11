@@ -34,7 +34,11 @@ void Sim::init()
 
 			tetras->addMass( i, vertices );
 		}
+
+        std::cout << MeshList[j]->AABB.min[0] << " " << MeshList[j]->AABB.min[1] << " " << MeshList[j]->AABB.min[2] << std::endl;
+        std::cout << MeshList[j]->AABB.max[0] << " " << MeshList[j]->AABB.max[1] << " " << MeshList[j]->AABB.max[2] << std::endl;
 	}
+
 }
 
 void Sim::clean()
@@ -95,6 +99,9 @@ void Sim::eulerIntegrationWithCollisionTesting(float dt)
 						vertices->updateParticleVelocity(dt, k);
 						vertices->updateParticlePosition(dt, k);
 					}
+
+                    Point3f p;
+                    p << vertices->pos[k][0], vertices->pos[k][1], vertices->pos[k][2];
 				}
 			}
 		}
@@ -137,7 +144,7 @@ void Sim::computeElasticForces( int frame )
 void Sim::update(float dt, int frame)
 {
 	clean(); //clears forces
-	computeNormals(); //compute triangle normals for all meshes
+    reComputeMeshAttributes(); //compute triangle normals for all meshes
 
     addExternalForces();
 	computeElasticForces(frame); //computes and adds elastic forces to each particle
@@ -145,11 +152,12 @@ void Sim::update(float dt, int frame)
     eulerIntegrationWithCollisionTesting(dt);
 }
 
-void Sim::computeNormals()
+void Sim::reComputeMeshAttributes()
 {
 	for(uint j=0; j<MeshList.size(); j++)
 	{
 		MeshList[j]->triangles->computeNormals(MeshList[j]->vertices);
+        MeshList[j]->calcBounds();
 	}
 }
 
@@ -168,6 +176,7 @@ bool Sim::LineTriangleIntersection(const Eigen::Matrix<T, 3, 1>& origPos, const 
 	// assuming only 2 meshes for now..
 	int tris = MeshList[1]->triangles->triFaceList.size();
 	isect->t = -1;
+    isect->hit = false;
 	isect->triangleIndex = -1;
 	for(int i=0; i < tris; i++)
 	{
@@ -195,7 +204,8 @@ void Sim::resolveCollisions( std::shared_ptr<Triangles>& triangles, std::shared_
 	// NOTE: triangles and vertices corresspond to the Triangles and Vertices of the other Mesh
 
 	// set position or velocity or both OR use momentum OR use paper's implementation with normal reaction forces and friction
-	Eigen::Matrix<uint, 3, 1> verticesOfTriangle = triangles->triFaceList[isect.triangleIndex];
+	Eigen::Matrix<uint, 3, 1> verticesOfTriangle;
+    verticesOfTriangle = triangles->triFaceList[isect.triangleIndex];
 
 	if(SET_POSITIONS)
 	{

@@ -37,7 +37,7 @@ public:
 	int gridIndex3Dto1D(int x, int y, int z, int gridResolution);
 
 	void calcBounds();
-	void updateBounds();
+	void updateBounds(const Bounds &newAABB);
 	void initializeGrid();
 
 	void resetMass();

@@ -15,6 +15,8 @@
 #include "src/utilities.h"
 #include "src/sim.h"
 
+#define CONVERT_OBJ_TO_POLY
+
 using T = double;
 
 constexpr int beginFrame = 2; //1 is initial state that is written separately
@@ -35,6 +37,9 @@ const std::string objFileNames[]  = { "../Assets/OBJs/FirstCube.obj",
 									  "../Assets/OBJs/SecondCube.obj" };
 const std::string bgeoFileNames[] = { "../Assets/BGEOs/jelloCube1Frame",
 									  "../Assets/BGEOs/jelloCube2Frame" };
+
+const std::string objToPolyNames[] = { "../Assets/objs_polys/teapot.obj",
+                                       "../Assets/objs_polys/teapot.poly" };
 
 void createScene( std::vector<std::shared_ptr<Mesh>>& MeshList )
 {
@@ -70,6 +75,9 @@ void writeBGEOsforMeshes( std::vector<std::shared_ptr<Mesh>>& MeshList, int fram
 
 int main(int argc, char* argv[])
 {
+#ifdef CONVERT_OBJ_TO_POLY
+    Utils::objToPoly(objToPolyNames[0], objToPolyNames[1]);
+#else
 	std::vector<std::shared_ptr<Mesh>> MeshList;
 	createScene( MeshList );
 
@@ -99,6 +107,6 @@ int main(int argc, char* argv[])
 	t = clock() - t;	// End sim
 
 	std::cout << "Simulated in " << ((float)t)/CLOCKS_PER_SEC << " seconds." << std::endl;
-	
+#endif
 	return 0;
 }

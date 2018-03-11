@@ -1,4 +1,6 @@
 Build/
+Assets/BGEOs/
+Houdini-Files/
 cmake-build-debug/
 .idea/
 

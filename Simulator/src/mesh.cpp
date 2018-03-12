@@ -42,6 +42,48 @@ void Mesh::resetMass()
 	}
 }
 
+void Mesh::initMeshForSim()
+{
+	// Precompute rest deformation (Dm), volume, inverse Dm, and volume*inverseDmTranspose for each tetrahedron
+	tetras->restDeformation.resize(tetras->numTetra);
+	tetras->restInverseDeformation.resize(tetras->numTetra);
+	tetras->undeformedVolume.resize(tetras->numTetra);
+	tetras->undefVol_into_restInvDefTranspose.resize(tetras->numTetra);
+
+	for(int j=0; j<tetras->numTetra; j++)
+	{
+		tetras->computeRestDeformation( j, vertices );
+		tetras->computeInvRestDeformation( j );
+		tetras->computeUndeformedVolume( j );
+		tetras->computeUndefVol_into_restInvDefTranspose( j );
+
+		tetras->addMass( j, vertices );
+	}
+}
+
+void Mesh::computeElasticForcesOnMesh(int frame)
+{
+	// Loop through tetras
+	for(int tetraIndex=0; tetraIndex < tetras->numTetra; tetraIndex++)
+	{
+		Eigen::Matrix<T,3,3> newDeformation = tetras->computeNewDeformation( tetraIndex, vertices ); // Compute Ds, the new deformation
+		Eigen::Matrix<T,3,3> F 				= tetras->computeF( tetraIndex, newDeformation ); // Compute F = Ds(Dm_inv)
+		Eigen::Matrix<T,3,3> P 				= tetras->computeP( tetraIndex, F, frame ); // Compute Piola (P)
+		Eigen::Matrix<T,3,3> H 				= tetras->computeH( tetraIndex, P ); // Compute Energy (H)
+
+		tetras->addForces( tetraIndex, vertices, H );// Add energy to forces (f += h)
+	}
+}
+
+void Mesh::clearForces()
+{
+	//Set forces for all vertices/particles to zero
+	for( int j=0; j < vertices->numParticles; j++ )
+	{
+		vertices->force[j] = Eigen::Matrix<T, 3, 1>::Zero();
+	}
+}
+
 //separate function because we have to tell the bounding box to move too
 void Mesh::translateMesh(Vector3f& translation)
 {

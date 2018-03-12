@@ -14,47 +14,62 @@ Sim::Sim( std::vector<std::shared_ptr<Mesh>>& MeshList ) : MeshList(MeshList)
 
 void Sim::init()
 {
-	for(uint j=0; j<MeshList.size(); j++)
+	for(uint i=0; i<MeshList.size(); i++)
 	{
-		std::shared_ptr<Tetrahedrons> tetras = MeshList[j]->tetras;
-		std::shared_ptr<Particles> vertices = MeshList[j]->vertices;
-
-		// Precompute rest deformation (Dm), volume, inverse Dm, and volume*inverseDmTranspose for each tetrahedron
-		tetras->restDeformation.resize(tetras->numTetra);
-		tetras->restInverseDeformation.resize(tetras->numTetra);
-		tetras->undeformedVolume.resize(tetras->numTetra);
-		tetras->undefVol_into_restInvDefTranspose.resize(tetras->numTetra);
-
-		for(int i=0; i<tetras->numTetra; i++)
-		{
-			tetras->computeRestDeformation( i, vertices );
-			tetras->computeInvRestDeformation( i );
-			tetras->computeUndeformedVolume( i );
-			tetras->computeUndefVol_into_restInvDefTranspose( i );
-
-			tetras->addMass( i, vertices );
-		}
-
-//        std::cout << MeshList[j]->AABB.min[0] << " " << MeshList[j]->AABB.min[1] << " " << MeshList[j]->AABB.min[2] << std::endl;
-//        std::cout << MeshList[j]->AABB.max[0] << " " << MeshList[j]->AABB.max[1] << " " << MeshList[j]->AABB.max[2] << std::endl;
+		MeshList[i]->initMeshForSim();
 	}
-
 }
 
 void Sim::clean()
 {
-	for(uint j=0; j<MeshList.size(); j++)
+	for(uint i=0; i<MeshList.size(); i++)
 	{
-		std::shared_ptr<Particles> vertices = MeshList[j]->vertices;
-		//Set forces for all vertices/particles to zero
-		for( int i=0; i < vertices->numParticles; i++ )
-		{
-			vertices->force[i] = Eigen::Matrix<T, 3, 1>::Zero();
-		}
+		MeshList[i]->clearForces();
 	}
 }
 
-void Sim::eulerIntegration(float dt)
+void Sim::reComputeMeshAttributes()
+{
+	for(uint i=0; i<MeshList.size(); i++)
+	{
+		MeshList[i]->triangles->computeNormals(MeshList[i]->vertices);
+		MeshList[i]->calcBounds();
+	}
+}
+
+void Sim::computeAllForces( int frame )
+{
+	for(uint i=0; i<MeshList.size(); i++)
+	{
+		//////////------------------ EXTERNAL FORCES ---------------/////////////
+		//Not abstracting to mesh because we could add forces that only operate on 
+		//some of the vertices and things like that which is annoying to genarlize for
+		std::shared_ptr<Particles> vertices = MeshList[i]->vertices;
+		
+		for(int j=0; j<vertices->numParticles; j++)
+		{
+			vertices->force[j](1) -= 9.81 * vertices->mass[j]; // gravity
+		}
+
+		//////////------------------ ELASTIC FORCES ---------------/////////////
+		MeshList[i]->computeElasticForcesOnMesh(frame);
+	}
+}
+
+void Sim::update(float dt, int frame)
+{
+	clean(); //clears forces
+    reComputeMeshAttributes(); //compute triangle normals for all meshes
+	computeAllForces(frame); //computes and adds elastic forces to each particle
+
+#if INTER_OBJECT_COLLISIONS
+    eulerIntegrationWithCollisionTesting(dt);
+#else
+    eulerIntegrationWithSDF_Collisions(dt);
+#endif
+}
+
+void Sim::eulerIntegrationWithSDF_Collisions(float dt)
 {
 	for(uint i=0; i<MeshList.size(); i++)
 	{
@@ -67,102 +82,36 @@ void Sim::eulerIntegration(float dt)
 
 void Sim::eulerIntegrationWithCollisionTesting(float dt)
 {
-	for(uint i=0; i<MeshList.size(); i++)
-	{
-		SDF_Collisions(dt, i);
+	eulerIntegrationWithSDF_Collisions(dt);
 
-		std::shared_ptr<Particles> vertices = MeshList[i]->vertices;
-		vertices->updateAllParticleVelocities(dt);
-		vertices->updateAllParticlePositions(dt);
-	}
-
-    uint j = 0;
-	//for(uint j=0; j<MeshList.size(); j++)
+    uint i = 0;
+	//for(uint i=0; i<MeshList.size(); i++)
 	{
 		//Check if this mesh's AABB is intersecting with any other mesh's AABB
-        uint i = 1;
-		//for(uint i=0; i<MeshList.size() && i!=j; i++)
+        uint j = 1;
+		//for(uint j=0; j<MeshList.size() && j!=i; j++)
 		{
-			bool intersects = Intersect_AABB_with_AABB( MeshList[j]->AABB, MeshList[i]->AABB );
+			bool intersects = Intersect_AABB_with_AABB( MeshList[i]->AABB, MeshList[j]->AABB );
 			
 			if(intersects)
 			{
-				std::shared_ptr<Particles> vertices = MeshList[j]->vertices; //Vertices of Current Mesh
+				std::shared_ptr<Particles> vertices = MeshList[i]->vertices; //Vertices of Current Mesh
 				// Then do a brute force check, i.e loop through all vertice of one mesh 
 				// OR use a grid structure or cull the triangles somehow
 				
 				for(int k = 0; k< vertices->numParticles; ++k)
 				{
 					bool collided = false;
-					Mesh_Collisions(dt, j, i, vertices, k, collided);
+					Mesh_Collisions(dt, i, j, vertices, k, collided);
 
 					if(!collided)
 					{
 						vertices->updateParticleVelocity(dt, k);
 						vertices->updateParticlePosition(dt, k);
 					}
-
-//                    Point3f p;
-//                    p << vertices->pos[k][0], vertices->pos[k][1], vertices->pos[k][2];
 				}
 			}
 		}
-	}
-}
-
-void Sim::addExternalForces()
-{
-	for(uint j=0; j<MeshList.size(); j++)
-	{
-		std::shared_ptr<Particles> vertices = MeshList[j]->vertices;
-		
-		for(int i=0; i<vertices->numParticles; i++)
-		{
-			vertices->force[i](1) -= 9.81 * vertices->mass[i]; // gravity
-		}
-	}
-}
-
-void Sim::computeElasticForces( int frame )
-{
-	for(uint j=0; j<MeshList.size(); j++)
-	{
-		std::shared_ptr<Tetrahedrons> tetras = MeshList[j]->tetras;
-		std::shared_ptr<Particles> vertices = MeshList[j]->vertices;
-
-		// Loop through tetras
-		for(int tetraIndex=0; tetraIndex < tetras->numTetra; tetraIndex++)
-		{
-			Eigen::Matrix<T,3,3> newDeformation = tetras->computeNewDeformation( tetraIndex, vertices ); // Compute Ds, the new deformation
-			Eigen::Matrix<T,3,3> F 				= tetras->computeF( tetraIndex, newDeformation ); // Compute F = Ds(Dm_inv)
-			Eigen::Matrix<T,3,3> P 				= tetras->computeP( tetraIndex, F, frame ); // Compute Piola (P)
-			Eigen::Matrix<T,3,3> H 				= tetras->computeH( tetraIndex, P ); // Compute Energy (H)
-
-			tetras->addForces( tetraIndex, vertices, H );// Add energy to forces (f += h)
-		}
-	}
-}
-
-void Sim::update(float dt, int frame)
-{
-	clean(); //clears forces
-    reComputeMeshAttributes(); //compute triangle normals for all meshes
-
-    addExternalForces();
-	computeElasticForces(frame); //computes and adds elastic forces to each particle
-#if INTER_OBJECT_COLLISIONS
-    eulerIntegrationWithCollisionTesting(dt);
-#else
-    eulerIntegration(dt);
-#endif
-}
-
-void Sim::reComputeMeshAttributes()
-{
-	for(uint j=0; j<MeshList.size(); j++)
-	{
-		MeshList[j]->triangles->computeNormals(MeshList[j]->vertices);
-        MeshList[j]->calcBounds();
 	}
 }
 
@@ -206,41 +155,7 @@ void Sim::resolveCollisions( std::shared_ptr<Triangles>& triangles, std::shared_
 	Intersection& isect, Eigen::Matrix<T, 3, 1>& displacement,
 	Eigen::Matrix<T, 3, 1>& particlePos, Eigen::Matrix<T, 3, 1>& particleVel )
 {
-	// NOTE: triangles and vertices corresspond to the Triangles and Vertices of the other Mesh
-
-	// set position or velocity or both OR use momentum OR use paper's implementation with normal reaction forces and friction
-	Eigen::Matrix<uint, 3, 1> verticesOfTriangle;
-    verticesOfTriangle = triangles->triFaceList[isect.triangleIndex];
-
-	if(SET_POSITIONS)
-	{
-		//---------------- Setting Positions ---------------------------------
-		particlePos = isect.point.cast<T>() - 0.01*displacement; // 1/4th to moving vertex
-		//displacement = 0.75f*displacement;				// 3/4th to moving triangle
-
-		// move vertices of triangle according to barycentric weights
-//		vertices->pos[verticesOfTriangle[0]] += isect.BarycentricWeights[0] * displacement;
-//		vertices->pos[verticesOfTriangle[1]] += isect.BarycentricWeights[1] * displacement;
-//		vertices->pos[verticesOfTriangle[2]] += isect.BarycentricWeights[2] * displacement;
-
-//        std::cout<< "disp: " << displacement << std::endl;
-//        std::cout<< "0: " << isect.BarycentricWeights[0] << std::endl;
-//        std::cout<< "1: " << isect.BarycentricWeights[1] << std::endl;
-//        std::cout<< "2: " << isect.BarycentricWeights[2] << std::endl;
-
-	}
-	if(SET_VELOCITIES)
-	{
-		particleVel = Eigen::Matrix<T, 3, 1>::Zero();
-        //vertices->force[i](1) -= 9.81 * vertices->mass[i]; // gravity
-
-		vertices->vel[verticesOfTriangle[0]] = Eigen::Matrix<T, 3, 1>::Zero();
-		vertices->vel[verticesOfTriangle[1]] = Eigen::Matrix<T, 3, 1>::Zero();
-		vertices->vel[verticesOfTriangle[2]] = Eigen::Matrix<T, 3, 1>::Zero();
-	}
-	if(PAPER)
-	{
-	}
+	//Move things in here from Mesh Collisions only when it works
 }
 
 void Sim::SDF_Collisions(float dt, uint j)
@@ -272,7 +187,7 @@ void Sim::SDF_Collisions(float dt, uint j)
 
 void Sim::Mesh_Collisions(float dt, uint i, uint j, std::shared_ptr<Particles>& vertices, int particleIndex, bool& collided)
 {
-	std::shared_ptr<Triangles> triangles = MeshList[0]->triangles;
+	std::shared_ptr<Triangles> triangles = MeshList[0]->triangles; //i --> current mesh's triangles
 
 	// for every vertex create a ray from the current position to its projected position in the next frame
 	// See if that ray intersects any triangle that Belongs to the other mesh.
@@ -286,9 +201,6 @@ void Sim::Mesh_Collisions(float dt, uint i, uint j, std::shared_ptr<Particles>& 
 		Eigen::Matrix<T, 3, 1> displacement;
         displacement = projectedPos - vertices->pos[particleIndex];
 
-		//resolveCollisions( MeshList[1]->triangles, MeshList[1]->vertices, isect, displacement,
-		//				vertices->pos[particleIndex], vertices->vel[particleIndex] );
-
         // set position or velocity or both OR use momentum OR use paper's implementation with normal reaction forces and friction
         Eigen::Matrix<uint, 3, 1> verticesOfTriangle;
         verticesOfTriangle = triangles->triFaceList[isect.triangleIndex];
@@ -296,7 +208,7 @@ void Sim::Mesh_Collisions(float dt, uint i, uint j, std::shared_ptr<Particles>& 
         if(SET_POSITIONS)
         {
             //---------------- Setting Positions ---------------------------------
-            MeshList[1]->vertices->pos[particleIndex] = isect.point.cast<T>() - 0.01*displacement; // 1/4th to moving vertex
+            MeshList[0]->vertices->pos[particleIndex] = isect.point.cast<T>() - 0.01*displacement; // 1/4th to moving vertex
             //displacement = 0.75f*displacement;				// 3/4th to moving triangle
 
             // move vertices of triangle according to barycentric weights
@@ -312,18 +224,16 @@ void Sim::Mesh_Collisions(float dt, uint i, uint j, std::shared_ptr<Particles>& 
         }
         if(SET_VELOCITIES)
         {
-            MeshList[1]->vertices->vel[particleIndex] = Eigen::Matrix<T, 3, 1>::Zero();
-            MeshList[1]->vertices->force[i](1) += 9.81 * MeshList[1]->vertices->mass[i]; // gravity
+            MeshList[0]->vertices->vel[particleIndex] = Eigen::Matrix<T, 3, 1>::Zero();
+            MeshList[0]->vertices->force[i](1) += 9.81 * MeshList[1]->vertices->mass[i]; // gravity
 
-            MeshList[0]->vertices->vel[verticesOfTriangle[0]] = Eigen::Matrix<T, 3, 1>::Zero();
-            MeshList[0]->vertices->vel[verticesOfTriangle[1]] = Eigen::Matrix<T, 3, 1>::Zero();
-            MeshList[0]->vertices->vel[verticesOfTriangle[2]] = Eigen::Matrix<T, 3, 1>::Zero();
+            MeshList[1]->vertices->vel[verticesOfTriangle[0]] = Eigen::Matrix<T, 3, 1>::Zero();
+            MeshList[1]->vertices->vel[verticesOfTriangle[1]] = Eigen::Matrix<T, 3, 1>::Zero();
+            MeshList[1]->vertices->vel[verticesOfTriangle[2]] = Eigen::Matrix<T, 3, 1>::Zero();
         }
         if(PAPER)
         {
         }
-
-
 
 		collided = true;
 	}

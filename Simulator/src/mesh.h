@@ -40,6 +40,10 @@ public:
 	void updateBounds(const Bounds &newAABB);
 	void initializeGrid();
 
+	void initMeshForSim();
+	void computeElasticForcesOnMesh(int frame);
+	void clearForces();
+
 	void resetMass();
 	void translateMesh(Vector3f& translation);
 

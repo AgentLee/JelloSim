@@ -63,10 +63,23 @@ void Sim::update(float dt, int frame)
 	computeAllForces(frame); //computes and adds elastic forces to each particle
 
 #if INTER_OBJECT_COLLISIONS
-    eulerIntegrationWithCollisionTesting(dt);
+    //eulerIntegrationWithCollisionTesting(dt);
+    eulerIntegration(dt);
+    Collisions(dt, 0, 1);
 #else
     eulerIntegrationWithSDF_Collisions(dt);
 #endif
+}
+
+void Sim::eulerIntegration(float dt)
+{
+    for(uint i=0; i<MeshList.size(); i++)
+    {
+        MeshList[i]->setPrevVerts();
+        std::shared_ptr<Particles> vertices = MeshList[i]->vertices;
+        vertices->updateAllParticleVelocities(dt);
+        vertices->updateAllParticlePositions(dt);
+    }
 }
 
 void Sim::eulerIntegrationWithSDF_Collisions(float dt)
@@ -208,7 +221,7 @@ void Sim::Mesh_Collisions(float dt, uint i, uint j, std::shared_ptr<Particles>& 
         if(SET_POSITIONS)
         {
             //---------------- Setting Positions ---------------------------------
-            MeshList[0]->vertices->pos[particleIndex] = isect.point.cast<T>() - 0.01*displacement; // 1/4th to moving vertex
+            MeshList[0]->vertices->pos[particleIndex] = isect.point.cast<T>() - displacement; // 1/4th to moving vertex
             //displacement = 0.75f*displacement;				// 3/4th to moving triangle
 
             // move vertices of triangle according to barycentric weights
@@ -237,4 +250,66 @@ void Sim::Mesh_Collisions(float dt, uint i, uint j, std::shared_ptr<Particles>& 
 
 		collided = true;
 	}
+}
+
+void Sim::Collisions(float dt, uint i, uint j)
+{
+    SDF_Collisions(dt, 0);
+    SDF_Collisions(dt, 1);
+    std::shared_ptr<Mesh> fallingMesh = MeshList[0];
+    std::shared_ptr<Mesh> standingMesh = MeshList[1];
+
+    bool intersects = Intersect_AABB_with_AABB( fallingMesh->AABB, standingMesh->AABB );
+
+    if(intersects)
+    {
+        for(int k = 0; k< fallingMesh->vertices->numParticles; ++k)
+        {
+            std::shared_ptr<Triangles> triangles = standingMesh->triangles; //i --> current mesh's triangles
+
+            // for every vertex create a ray from the current position to its projected position in the next frame
+            // See if that ray intersects any triangle that Belongs to the other mesh.
+            //Eigen::Matrix<T, 3, 1> projectedPos = vertices->pos[particleIndex] + vertices->vel[particleIndex] * dt;
+            Intersection isect;
+            LineTriangleIntersection(fallingMesh->vertices->pos[k], fallingMesh->prevVerts->pos[k], &isect);
+
+            if(isect.hit)
+            {
+                //resolve collisions between vertex and a triangle
+                Eigen::Matrix<T, 3, 1> displacement;
+                displacement = fallingMesh->vertices->pos[k] - isect.point;
+
+                // set position or velocity or both OR use momentum OR use paper's implementation with normal reaction forces and friction
+                Eigen::Matrix<uint, 3, 1> verticesOfTriangle;
+                verticesOfTriangle = triangles->triFaceList[isect.triangleIndex];
+
+                if(SET_POSITIONS)
+                {
+                    //---------------- Setting Positions ---------------------------------
+                    fallingMesh->vertices->pos[k] = fallingMesh->prevVerts->pos[k]; //isect.point.cast<T>() - displacement; // 1/4th to moving vertex
+                    //displacement = 0.75f*displacement;				// 3/4th to moving triangle
+
+                    // move vertices of triangle according to barycentric weights
+                    standingMesh->vertices->pos[verticesOfTriangle[0]] += isect.BarycentricWeights[0] * displacement;
+                    standingMesh->vertices->pos[verticesOfTriangle[1]] += isect.BarycentricWeights[1] * displacement;
+                    standingMesh->vertices->pos[verticesOfTriangle[2]] += isect.BarycentricWeights[2] * displacement;
+
+//        std::cout<< "disp: " << displacement << std::endl;
+//        std::cout<< "0: " << isect.BarycentricWeights[0] << std::endl;
+//        std::cout<< "1: " << isect.BarycentricWeights[1] << std::endl;
+//        std::cout<< "2: " << isect.BarycentricWeights[2] << std::endl;
+
+                }
+                if(SET_VELOCITIES)
+                {
+                    fallingMesh->vertices->vel[k] = Eigen::Matrix<T, 3, 1>::Zero();
+                    //MeshList[0]->vertices->force[i](1) += 9.81 * MeshList[1]->vertices->mass[i]; // gravity
+
+                    MeshList[1]->vertices->vel[verticesOfTriangle[0]] = Eigen::Matrix<T, 3, 1>::Zero();
+                    MeshList[1]->vertices->vel[verticesOfTriangle[1]] = Eigen::Matrix<T, 3, 1>::Zero();
+                    MeshList[1]->vertices->vel[verticesOfTriangle[2]] = Eigen::Matrix<T, 3, 1>::Zero();
+                }
+            }
+        }
+    }
 }

@@ -12,6 +12,8 @@ Mesh::Mesh( const std::string& nodeFile, const std::string& faceFile,
 	tetRead( nodeFile, faceFile, eleFile, objFile );
 	resetMass();
 
+    prevVerts  = std::make_shared<Particles>(vertices->numParticles, 0.0f);
+
 	AABB = Bounds();
 	calcBounds();
 	initializeGrid();
@@ -132,3 +134,13 @@ void Mesh::tetRead( const std::string& nodeFile, const std::string& faceFile, co
 	tetras->tetgen_readEleFile( eleFile ); //read in tetrahedrons with particle indices
 	triangles->create_objFile( objFile, vertices );
 }
+
+void Mesh::setPrevVerts()
+{
+    for(int i=0; i<prevVerts->numParticles; i++)
+    {
+        prevVerts->pos[i] = vertices->pos[i];
+        prevVerts->vel[i] = vertices->vel[i];
+    }
+}
+

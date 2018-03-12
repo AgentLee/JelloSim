@@ -17,6 +17,7 @@
 class Mesh
 {
 public:
+    std::shared_ptr<Particles> prevVerts;
 	std::shared_ptr<Particles> vertices;
 	std::shared_ptr<Triangles> triangles;
 	std::shared_ptr<Tetrahedrons> tetras;
@@ -46,6 +47,8 @@ public:
 
 	void resetMass();
 	void translateMesh(Vector3f& translation);
+
+    void setPrevVerts();
 
 	void tetRead( const std::string& nodeFile, const std::string& faceFile, const std::string& eleFile, const std::string& objFile );
 

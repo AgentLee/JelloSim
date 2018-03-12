@@ -181,8 +181,11 @@ void Sim::Collisions(float dt)
 
     for(uint i=0; i<MeshList.size(); i++)
     {
-        for (uint j = 0; j < MeshList.size(); j++)
+        for (uint j =i+1; j < MeshList.size(); j++)
         {
+            if(i==j)
+                continue;
+
             std::shared_ptr<Mesh> fallingMesh = MeshList[i];
             std::shared_ptr<Mesh> standingMesh = MeshList[j];
 
@@ -207,34 +210,39 @@ void Sim::Collisions(float dt)
                         Eigen::Matrix<uint, 3, 1> verticesOfTriangle;
                         verticesOfTriangle = triangles->triFaceList[isect.triangleIndex];
 
-                        if (SET_POSITIONS) {
+                        if (SET_POSITIONS)
+                        {
                             //---------------- Setting Positions ---------------------------------
                             //fallingMesh->vertices->pos[k] = fallingMesh->prevVerts->pos[k]; //isect.point.cast<T>() - displacement; // 1/4th to moving vertex
-                            newPositions[i][k] = isect.point - 1.3 * displacement;
+                            newPositions[i][k] = fallingMesh->prevVerts->pos[k] - 1.3 * displacement;
                             //displacement = 0.75f*displacement;				// 3/4th to moving triangle
 
                             // move vertices of triangle according to barycentric weights
-//                            standingMesh->vertices->pos[verticesOfTriangle[0]] +=
-//                                    isect.BarycentricWeights[0] * displacement;
-//                            standingMesh->vertices->pos[verticesOfTriangle[1]] +=
-//                                    isect.BarycentricWeights[1] * displacement;
-//                            standingMesh->vertices->pos[verticesOfTriangle[2]] +=
-//                                    isect.BarycentricWeights[2] * displacement;
-
-                            //        std::cout<< "disp: " << displacement << std::endl;
-                            //        std::cout<< "0: " << isect.BarycentricWeights[0] << std::endl;
-                            //        std::cout<< "1: " << isect.BarycentricWeights[1] << std::endl;
-                            //        std::cout<< "2: " << isect.BarycentricWeights[2] << std::endl;
-
+//                            newPositions[j][verticesOfTriangle[0]] = standingMesh->vertices->pos[verticesOfTriangle[0]] + displacement;
+//                            newPositions[j][verticesOfTriangle[1]] = standingMesh->vertices->pos[verticesOfTriangle[1]] + displacement;
+//                            newPositions[j][verticesOfTriangle[2]] = standingMesh->vertices->pos[verticesOfTriangle[2]] + displacement;
                         }
-                        if (SET_VELOCITIES) {
-                            //fallingMesh->vertices->vel[k] = Eigen::Matrix<T, 3, 1>::Zero();
-                            newVelocities[i][k] = Eigen::Matrix<T, 3, 1>::Zero();
-                            //MeshList[0]->vertices->force[i](1) += 9.81 * MeshList[1]->vertices->mass[i]; // gravity
-//
-//                            MeshList[1]->vertices->vel[verticesOfTriangle[0]] = Eigen::Matrix<T, 3, 1>::Zero();
-//                            MeshList[1]->vertices->vel[verticesOfTriangle[1]] = Eigen::Matrix<T, 3, 1>::Zero();
-//                            MeshList[1]->vertices->vel[verticesOfTriangle[2]] = Eigen::Matrix<T, 3, 1>::Zero();
+                        if (SET_VELOCITIES)
+                        {
+                            Eigen::Matrix<T, 3, 1> normal;
+                            normal = triangles->triNormalList[isect.triangleIndex];
+
+                            Eigen::Matrix<T, 3, 1> d;
+                            d = fallingMesh->vertices->vel[k];
+
+                            if(normal.dot(d) < 0.0f)
+                            {
+                                normal = -normal;
+                            }
+
+                            //dir.normalize();
+                            Eigen::Matrix<T, 3, 1> reflected;
+                            reflected = d - 2.0f*(d.dot(normal))*normal;
+                            newVelocities[i][k] = reflected;//Eigen::Matrix<T, 3, 1>::Zero();
+
+//                            newVelocities[j][verticesOfTriangle[0]] = standingMesh->vertices->vel[verticesOfTriangle[0]] + fallingMesh->vertices->vel[k];//standingMesh->vertices->vel[verticesOfTriangle[0]] + displacement;
+//                            newVelocities[j][verticesOfTriangle[1]] = standingMesh->vertices->vel[verticesOfTriangle[1]] + fallingMesh->vertices->vel[k];
+//                            newVelocities[j][verticesOfTriangle[2]] = standingMesh->vertices->vel[verticesOfTriangle[2]] + fallingMesh->vertices->vel[k];
                         }
                     }
                 }

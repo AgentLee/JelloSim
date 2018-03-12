@@ -99,7 +99,8 @@ void Triangles::computeNormals(std::shared_ptr<Particles>& vertices)
         Eigen::Matrix<T, 3, 1> vec1 = points[1] - points[0];
         Eigen::Matrix<T, 3, 1> vec2 = points[2] - points[1];
 
-        triNormalList[i] = cross(vec1, vec2);
+        triNormalList[i] = -cross(vec1, vec2);
+        triNormalList[i].normalize();
     }
 }
 
@@ -108,13 +109,14 @@ bool Triangles::intersect(const Ray &r, const int &triIndex, float *t, std::shar
 {
     Eigen::Matrix<T, 3, 1> planeNormal = triNormalList[triIndex];
     Eigen::Matrix<T, 3, 1> points[3];
-//    uint v0 = triFaceList[triIndex][0];
-//    uint v1 = triFaceList[triIndex][1];
-//    uint v2 = triFaceList[triIndex][2];
-    //std::cout << vertices->pos[v0][0] << std::endl;
     points[0] << vertices->pos[triFaceList[triIndex][0]];
     points[1] << vertices->pos[triFaceList[triIndex][1]];
     points[2] << vertices->pos[triFaceList[triIndex][2]];
+
+//    if(planeNormal.dot(r.direction) < 0)
+//    {
+//        return false;
+//    }
 
     //1. Ray-plane intersection
     float tnew =  planeNormal.dot(points[0] - r.origin) / planeNormal.dot(r.direction);
@@ -131,6 +133,7 @@ bool Triangles::intersect(const Ray &r, const int &triIndex, float *t, std::shar
 
     if(s1 >= 0 && s1 <= 1 && s2 >= 0 && s2 <= 1 && s3 >= 0 && s3 <= 1 && fequal(sum, 1.0f)) {
         *t = tnew;
+        //std::cout<<s1<<" "<<s2<<" "<<s3<<std::endl;
         (*baryCoords) << s1 , s2, s3;
         return true;
     }

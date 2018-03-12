@@ -44,7 +44,7 @@ const std::string objToPolyNames[] = { "../Assets/objs_polys/teapotURN.obj",
 void createScene( std::vector<std::shared_ptr<Mesh>>& MeshList )
 {
 	const float gridCellSize = 1.0f;
-	Vector3f translation = Vector3f(0.0f, 1.5f, 0.0f);
+	Vector3f translation = Vector3f(0.1f, 1.6f, 0.1f);
 
 	{
 		std::shared_ptr<Mesh> cube1 = std::make_shared<Mesh>( nodeFileNames[0], faceFileNames[0], 

@@ -9,6 +9,8 @@ Mesh::Mesh( const std::string& nodeFile, const std::string& faceFile,
 	triangles = std::make_shared<Triangles>();
 	tetras    = std::make_shared<Tetrahedrons>( _density, _poissonsRatio, _youngsModulus );
 
+	gridResolution = _gridCellSize;
+
 	tetRead( nodeFile, faceFile, eleFile, objFile );
 	resetMass();
 

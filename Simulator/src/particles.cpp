@@ -48,6 +48,29 @@ void Particles::updateParticleVelocity(T dt, uint index)
     vel[index] += force[index] / mass[index] * dt;
 }
 
+
+void Particles::updateAllParticlePositionsBackwardEuler(T dt) {
+    for(int i=0; i<numParticles; i++)
+    {
+        pos[i] = (pos[i] + vel[i] * dt) / (1 + pow(dt, 2));
+    }
+}
+
+void Particles::updateAllParticleVelocitiesBackwardEuler(T dt) {
+    for(int i=0; i<numParticles; i++)
+    {
+        vel[i] += force[i] / mass[i] * dt;
+    }
+}
+
+void Particles::updateParticlePositionBackwardEuler(T dt, uint index) {
+    pos[index] = (pos[index] + vel[index] * dt) / (1 + pow(dt, 2));
+}
+
+void Particles::updateParticleVelocityBackwardEuler(T dt, uint index) {
+    vel[index] += force[index] / mass[index] * dt;
+}
+
 /*
  *  .node FILE FORMAT:
  *      http://wias-berlin.de/software/tetgen/1.5/doc/manual/manual006.html

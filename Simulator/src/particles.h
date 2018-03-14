@@ -1,6 +1,7 @@
 #pragma once
 #include <Eigen/Core>
 #include <Eigen/Dense>
+#include <Eigen/Sparse>
 
 #include <vector>
 #include <string>
@@ -29,6 +30,11 @@ public:
 	void updateAllParticleVelocities(T dt);
 	void updateParticlePosition(T dt, uint index);
 	void updateParticleVelocity(T dt, uint index);
+
+	void updateAllParticlePositionsBackwardEuler(T dt);
+	void updateAllParticleVelocitiesBackwardEuler(T dt);
+	void updateParticlePositionBackwardEuler(T dt, uint index);
+	void updateParticleVelocityBackwardEuler(T dt, uint index);
 
 	// Reads Tetgen file and stores data
 	void tetgen_readLine(std::ifstream &fin, int numDims, int numAtt);

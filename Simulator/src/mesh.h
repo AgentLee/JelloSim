@@ -44,7 +44,7 @@ public:
 	void translateMesh(Vector3f& translation);
 
 	void tetRead( const std::string& nodeFile, const std::string& faceFile, const std::string& eleFile, const std::string& objFile );
-
+	
 private:
 	float gridResolution;
 };

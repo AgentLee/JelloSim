@@ -24,8 +24,9 @@ class Sim
 {
 public:
 	std::vector<std::shared_ptr<Mesh>> MeshList;
+    Bounds FixedRegion;
 
-	Sim( std::vector<std::shared_ptr<Mesh>>& MeshList );
+	Sim( std::vector<std::shared_ptr<Mesh>>& MeshList, Bounds& FixedRegion );
 
 	void init();
 	void clean();

@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "bounds.h"
+
 using T = double;
 constexpr int dim = 3;
 const int num = 50;
@@ -26,7 +28,7 @@ public:
 
 	Particles(int n, T initialMass);
 	void updateAllParticlePositions(T dt);
-	void updateAllParticleVelocities(T dt);
+	void updateAllParticleVelocities(T dt, Bounds& FixedRegion);
 	void updateParticlePosition(T dt, uint index);
 	void updateParticleVelocity(T dt, uint index);
 

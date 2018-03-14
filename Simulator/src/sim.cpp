@@ -7,9 +7,9 @@
 #define SET_POSITIONS 1
 #define SET_VELOCITIES 1
 #define PAPER 0
-#define INTER_OBJECT_COLLISIONS 1
+#define INTER_OBJECT_COLLISIONS 0
 
-Sim::Sim( std::vector<std::shared_ptr<Mesh>>& MeshList ) : MeshList(MeshList)
+Sim::Sim( std::vector<std::shared_ptr<Mesh>>& MeshList, Bounds& FixedRegion ) : MeshList(MeshList), FixedRegion(FixedRegion)
 {}
 
 void Sim::init()
@@ -77,7 +77,7 @@ void Sim::eulerIntegration(float dt)
     {
         MeshList[i]->setPrevVerts();
         std::shared_ptr<Particles> vertices = MeshList[i]->vertices;
-        vertices->updateAllParticleVelocities(dt);
+        vertices->updateAllParticleVelocities(dt, FixedRegion);
         vertices->updateAllParticlePositions(dt);
     }
 }
@@ -88,7 +88,7 @@ void Sim::eulerIntegrationWithSDF_Collisions(float dt)
 	{
         SDF_Collisions(dt, i);
 		std::shared_ptr<Particles> vertices = MeshList[i]->vertices;
-		vertices->updateAllParticleVelocities(dt);
+		vertices->updateAllParticleVelocities(dt, FixedRegion);
 		vertices->updateAllParticlePositions(dt);
 	}
 }

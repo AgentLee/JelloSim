@@ -30,11 +30,20 @@ void Particles::updateAllParticlePositions(T dt)
     }
 }
 
-void Particles::updateAllParticleVelocities(T dt)
+void Particles::updateAllParticleVelocities(T dt, Bounds& FixedRegion)
 {
     for(int i=0; i<numParticles; i++)
     {
-        vel[i] += force[i] / mass[i] * dt;
+        Point3f position;
+        position << pos[i][0], pos[i][1], pos[i][2];
+        if(FixedRegion.Contains(position))
+        {
+            vel[i] *= 0.0;
+        }
+        else
+        {
+            vel[i] += force[i] / mass[i] * dt;
+        }
     }
 }
 

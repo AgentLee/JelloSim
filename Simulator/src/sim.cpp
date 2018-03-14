@@ -184,15 +184,19 @@ void Sim::Collisions(float dt)
         for (uint j =i+1; j < MeshList.size(); j++)
         {
             if(i==j)
+            {
                 continue;
+            }
 
             std::shared_ptr<Mesh> fallingMesh = MeshList[i];
             std::shared_ptr<Mesh> standingMesh = MeshList[j];
 
             bool intersects = Intersect_AABB_with_AABB(fallingMesh->AABB, standingMesh->AABB);
 
-            if (intersects) {
-                for (int k = 0; k < fallingMesh->vertices->numParticles; ++k) {
+            if (intersects) 
+            {
+                for (int k = 0; k < fallingMesh->vertices->numParticles; ++k) 
+                {
                     std::shared_ptr<Triangles> triangles = standingMesh->triangles; //i --> current mesh's triangles
 
                     // for every vertex create a ray from the current position to its projected position in the next frame
@@ -201,7 +205,8 @@ void Sim::Collisions(float dt)
                     Intersection isect;
                     LineTriangleIntersection(fallingMesh->vertices->pos[k], fallingMesh->prevVerts->pos[k], &isect);
 
-                    if (isect.hit) {
+                    if (isect.hit) 
+                    {
                         //resolve collisions between vertex and a triangle
                         Eigen::Matrix<T, 3, 1> displacement;
                         displacement = fallingMesh->vertices->pos[k] - isect.point;
@@ -212,10 +217,7 @@ void Sim::Collisions(float dt)
 
                         if (SET_POSITIONS)
                         {
-                            //---------------- Setting Positions ---------------------------------
-                            //fallingMesh->vertices->pos[k] = fallingMesh->prevVerts->pos[k]; //isect.point.cast<T>() - displacement; // 1/4th to moving vertex
                             newPositions[i][k] = fallingMesh->prevVerts->pos[k] - 1.3 * displacement;
-                            //displacement = 0.75f*displacement;				// 3/4th to moving triangle
 
                             // move vertices of triangle according to barycentric weights
 //                            newPositions[j][verticesOfTriangle[0]] = standingMesh->vertices->pos[verticesOfTriangle[0]] + displacement;

@@ -72,11 +72,11 @@ void createScene( std::vector<std::shared_ptr<Mesh>>& MeshList, Bounds* FixedReg
 
 void writeBGEOsforMeshes( std::vector<std::shared_ptr<Mesh>>& MeshList, int frameNumber )
 {
-	std::cout << "Simualting Frame: " << frameNumber << "..." << std::endl;
 	for(uint i=0; i<MeshList.size(); i++)
 	{
 		Utils::writeBGEOforFrame( bgeoFileNames[i], frameNumber, MeshList[i]->vertices );
 	}
+	std::cout << "Frame " << frameNumber << " Simualted "  << "..." << std::endl;
 }
 
 int main(int argc, char* argv[])

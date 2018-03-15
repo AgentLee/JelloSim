@@ -42,5 +42,6 @@ public:
 	void SDF_Collisions(float dt, uint j);
     void Collisions(float dt);
 	
-    bool LineTriangleIntersection(const Eigen::Matrix<T, 3, 1>& origPos, const Eigen::Matrix<T, 3, 1>& newPos, Intersection *isect);
+    bool LineTriangleIntersection(const Eigen::Matrix<T, 3, 1>& origPos, const Eigen::Matrix<T, 3, 1>& newPos,
+                                  std::shared_ptr<Mesh> standingMesh, Intersection *isect, float dt);
 };

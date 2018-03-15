@@ -165,34 +165,39 @@ void Sim::Collisions(float dt)
                         //resolve collisions between vertex and a triangle
                         if (SET_POSITIONS)
                         {
-                            newPositions[i][k] = fallingMesh->prevVerts->pos[k] - 1.3 * isect.penetrationDistance;
+                            newPositions[i][k] = fallingMesh->prevVerts->pos[k];
+                            // newPositions[i][k] = isect.point - 2.0 * isect.penetrationDistance;
 
                             // move vertices of triangle according to barycentric weights
-//                            newPositions[j][verticesOfTriangle[0]] = standingMesh->vertices->pos[verticesOfTriangle[0]] + displacement;
-//                            newPositions[j][verticesOfTriangle[1]] = standingMesh->vertices->pos[verticesOfTriangle[1]] + displacement;
-//                            newPositions[j][verticesOfTriangle[2]] = standingMesh->vertices->pos[verticesOfTriangle[2]] + displacement;
+                            newPositions[j][isect.vertsOfTriangle[0]] += isect.penetrationDistance;
+                            newPositions[j][isect.vertsOfTriangle[1]] += isect.penetrationDistance;
+                            newPositions[j][isect.vertsOfTriangle[2]] += isect.penetrationDistance;
+                            newPositions[j][isect.vertsOfTriangle[0]] = standingMesh->prevVerts->pos[isect.vertsOfTriangle[0]];
+                            newPositions[j][isect.vertsOfTriangle[1]] = standingMesh->prevVerts->pos[isect.vertsOfTriangle[1]];
+                            newPositions[j][isect.vertsOfTriangle[2]] = standingMesh->prevVerts->pos[isect.vertsOfTriangle[2]];
                         }
                         if (SET_VELOCITIES)
                         {
-                            Eigen::Matrix<T, 3, 1> normal;
-                            normal = triangles->triNormalList[isect.triangleIndex];
+                            // Eigen::Matrix<T, 3, 1> normal;
+                            // normal = triangles->triNormalList[isect.triangleIndex];
 
-                            Eigen::Matrix<T, 3, 1> d;
-                            d = fallingMesh->vertices->vel[k];
+                            // Eigen::Matrix<T, 3, 1> d;
+                            // d = fallingMesh->vertices->vel[k];
 
-                            if(normal.dot(d) < 0.0f)
-                            {
-                                normal = -normal;
-                            }
+                            // if(normal.dot(d) < 0.0f)
+                            // {
+                            //     normal = -normal;
+                            // }
 
-                            //dir.normalize();
-                            Eigen::Matrix<T, 3, 1> reflected;
-                            reflected = d - 2.0f*(d.dot(normal))*normal;
-                            newVelocities[i][k] = reflected;//Eigen::Matrix<T, 3, 1>::Zero();
+                            // d.normalize();
+                            // Eigen::Matrix<T, 3, 1> reflected;
+                            // reflected = d - 2.0f*(d.dot(normal))*normal;
+                            // newVelocities[i][k] = reflected;//Eigen::Matrix<T, 3, 1>::Zero();
+                            newVelocities[i][k] = fallingMesh->vertices->vel[k];
 
-//                            newVelocities[j][verticesOfTriangle[0]] = standingMesh->vertices->vel[verticesOfTriangle[0]] + fallingMesh->vertices->vel[k];//standingMesh->vertices->vel[verticesOfTriangle[0]] + displacement;
-//                            newVelocities[j][verticesOfTriangle[1]] = standingMesh->vertices->vel[verticesOfTriangle[1]] + fallingMesh->vertices->vel[k];
-//                            newVelocities[j][verticesOfTriangle[2]] = standingMesh->vertices->vel[verticesOfTriangle[2]] + fallingMesh->vertices->vel[k];
+                            newVelocities[j][isect.vertsOfTriangle[0]] += fallingMesh->vertices->vel[k];
+                            newVelocities[j][isect.vertsOfTriangle[1]] += fallingMesh->vertices->vel[k];
+                            newVelocities[j][isect.vertsOfTriangle[2]] += fallingMesh->vertices->vel[k];
                         }
                     }
                 }

@@ -7,7 +7,7 @@
 #define SET_POSITIONS 1
 #define SET_VELOCITIES 1
 #define PAPER 0
-#define INTER_OBJECT_COLLISIONS 0
+#define INTER_OBJECT_COLLISIONS 1
 
 Sim::Sim( std::vector<std::shared_ptr<Mesh>>& MeshList, Bounds& FixedRegion ) : MeshList(MeshList), FixedRegion(FixedRegion)
 {}
@@ -63,7 +63,6 @@ void Sim::update(float dt, int frame)
 	computeAllForces(frame); //computes and adds elastic forces to each particle
 
 #if INTER_OBJECT_COLLISIONS
-    //eulerIntegrationWithCollisionTesting(dt);
     eulerIntegration(dt);
     Collisions(dt);
 #else
@@ -91,42 +90,6 @@ void Sim::eulerIntegrationWithSDF_Collisions(float dt)
 		vertices->updateAllParticleVelocities(dt, FixedRegion);
 		vertices->updateAllParticlePositions(dt);
 	}
-}
-
-// returns index of closest triangle on 2nd mesh.. -1 otherwise..
-// also sets t to dist of closest tri.. -1 otherwise..
-bool Sim::LineTriangleIntersection(const Eigen::Matrix<T, 3, 1>& origPos, const Eigen::Matrix<T, 3, 1>& newPos, Intersection *isect)
-{
-	// create ray and call triangle intersection for all triangles..
-	// store triangle reference
-	Ray r;
-	r.origin = origPos;
-	r.direction = Eigen::Matrix<T, 3, 1>(newPos - origPos);
-    float length = r.direction.norm();
-    r.direction.normalize();
-
-	// assuming only 2 meshes for now..
-	int tris = MeshList[1]->triangles->triFaceList.size();
-	isect->t = std::numeric_limits<T>::infinity();
-    isect->hit = false;
-	isect->triangleIndex = -1;
-	for(int i=0; i < tris; i++)
-	{
-		float tTemp = isect->t;
-        Eigen::Matrix<T, 3, 1> baryCoords;
-		bool intersect = MeshList[1]->triangles->intersect(r, i, &tTemp, MeshList[1]->vertices, &baryCoords);
-		if(intersect && isect->t > tTemp && tTemp <= length)
-        {
-            isect->hit = true;
-            isect->triangleIndex = i;
-            isect->t = tTemp;
-            isect->BarycentricWeights = baryCoords;
-            isect->normal = MeshList[1]->triangles->triNormalList[i];
-            isect->point = r.origin + tTemp * r.direction;
-		}
-	}
-
-	return isect->hit;
 }
 
 void Sim::SDF_Collisions(float dt, uint j)
@@ -183,41 +146,26 @@ void Sim::Collisions(float dt)
     {
         for (uint j =i+1; j < MeshList.size(); j++)
         {
-            if(i==j)
-            {
-                continue;
-            }
-
             std::shared_ptr<Mesh> fallingMesh = MeshList[i];
             std::shared_ptr<Mesh> standingMesh = MeshList[j];
 
-            bool intersects = Intersect_AABB_with_AABB(fallingMesh->AABB, standingMesh->AABB);
+            bool possibleIntersectsion = Intersect_AABB_with_AABB(fallingMesh->AABB, standingMesh->AABB);
 
-            if (intersects) 
+            if (possibleIntersectsion) 
             {
                 for (int k = 0; k < fallingMesh->vertices->numParticles; ++k) 
                 {
-                    std::shared_ptr<Triangles> triangles = standingMesh->triangles; //i --> current mesh's triangles
-
-                    // for every vertex create a ray from the current position to its projected position in the next frame
-                    // See if that ray intersects any triangle that Belongs to the other mesh.
-                    //Eigen::Matrix<T, 3, 1> projectedPos = vertices->pos[particleIndex] + vertices->vel[particleIndex] * dt;
                     Intersection isect;
-                    LineTriangleIntersection(fallingMesh->vertices->pos[k], fallingMesh->prevVerts->pos[k], &isect);
+                    IntersectionTesting( fallingMesh, standingMesh, k, &isect);
 
                     if (isect.hit) 
                     {
+                        std::shared_ptr<Triangles> triangles = standingMesh->triangles;
+
                         //resolve collisions between vertex and a triangle
-                        Eigen::Matrix<T, 3, 1> displacement;
-                        displacement = fallingMesh->vertices->pos[k] - isect.point;
-
-                        // set position or velocity or both OR use momentum OR use paper's implementation with normal reaction forces and friction
-                        Eigen::Matrix<uint, 3, 1> verticesOfTriangle;
-                        verticesOfTriangle = triangles->triFaceList[isect.triangleIndex];
-
                         if (SET_POSITIONS)
                         {
-                            newPositions[i][k] = fallingMesh->prevVerts->pos[k] - 1.3 * displacement;
+                            newPositions[i][k] = fallingMesh->prevVerts->pos[k] - 1.3 * isect.penetrationDistance;
 
                             // move vertices of triangle according to barycentric weights
 //                            newPositions[j][verticesOfTriangle[0]] = standingMesh->vertices->pos[verticesOfTriangle[0]] + displacement;
@@ -260,4 +208,73 @@ void Sim::Collisions(float dt)
             MeshList[i]->vertices->vel[j] = newVelocities[i][j];
         }
     }
+}
+
+// returns index of closest triangle on 2nd mesh.. -1 otherwise..
+// also sets t to dist of closest tri.. -1 otherwise..
+bool Sim::IntersectionTesting(std::shared_ptr<Mesh> meshA, std::shared_ptr<Mesh> meshB, int vertexID, Intersection *isect)
+{
+    Eigen::Matrix<T, 3, 1>& vCurr = meshA->vertices->pos[vertexID];
+    Eigen::Matrix<T, 3, 1>& vPrev = meshA->prevVerts->pos[vertexID];
+    std::shared_ptr<Triangles> trianglesB = meshB->triangles;
+    int numTris = trianglesB->triFaceList.size();
+
+    isect->t = std::numeric_limits<T>::infinity();
+    isect->hit = false;
+    isect->triangleIndex = -1;
+
+    Eigen::Matrix<T, 3, 1> dir = Eigen::Matrix<T, 3, 1>(vCurr - vPrev);
+    Ray forwardRay(vPrev, dir); //Ray going towards curr vertex Pos
+    float forwardRayLength = forwardRay.direction.norm();
+    forwardRay.direction.normalize();
+    //-----------------------------------------------------------------------------
+
+    for(int i=0; i < numTris; i++)
+    {
+        //Test Moving Vertex against Stationary Triangle
+        float tTemp = isect->t;
+        Eigen::Matrix<T, 3, 1> baryCoords;
+        bool intersect = meshB->triangles->intersect(forwardRay, i, &tTemp, meshB->vertices, &baryCoords);
+
+        if((intersect && isect->t > tTemp) && (tTemp <= forwardRayLength))
+        {
+            isect->hit = true;
+            isect->triangleIndex = i;
+            isect->t = tTemp;
+            isect->BarycentricWeights = baryCoords;
+            isect->normal = meshB->triangles->triNormalList[i];
+            isect->point = forwardRay.origin + tTemp * forwardRay.direction;
+            isect->penetrationDistance = tTemp * forwardRay.direction;
+            isect->vertsOfTriangle = meshB->triangles->triFaceList[i];
+        }
+
+        //------------------------------------------------------//
+        //Test Moving Triangle against Stationary Vertex
+        if (!isect->hit) 
+        {
+            Eigen::Matrix<T, 3, 1> triAvgVel;
+            trianglesB->computeAvgVelocity(i, triAvgVel, meshB->vertices, meshB->prevVerts);
+            Ray rayTVF(vCurr, -triAvgVel); //Ray trying to hit triangle in its previous position with a direction dictated by the -ve of the triangle's velocity
+            Ray rayTVB(vCurr, triAvgVel); //Ray trying to hit triangle in its current position with a direction dictated by the triangle's velocity
+
+            //we dont care about the first intersection beyond that it intersects and so we can override 
+            //the data in tTemp and baryCoords
+            bool intersectF = meshB->triangles->intersect(rayTVF, i, &tTemp, meshB->vertices, &baryCoords);
+            bool intersectB = meshB->triangles->intersect(rayTVB, i, &tTemp, meshB->vertices, &baryCoords);
+            if(intersectF && intersectB)
+            {
+                //Point was engulfed by Moving Triangle
+                isect->hit = true;
+                isect->triangleIndex = i;
+                isect->t = tTemp;
+                isect->BarycentricWeights = baryCoords;
+                isect->normal = meshB->triangles->triNormalList[i];
+                isect->point = rayTVB.origin + tTemp * rayTVB.direction;
+                isect->penetrationDistance = tTemp * rayTVB.direction;
+                isect->vertsOfTriangle = meshB->triangles->triFaceList[i];
+            }
+        }
+    }
+
+    return isect->hit;
 }

@@ -104,6 +104,19 @@ void Triangles::computeNormals(std::shared_ptr<Particles>& vertices)
     }
 }
 
+void Triangles::computeAvgVelocity(const int& triIndex, Eigen::Matrix<T, 3, 1>& triAvgVel, std::shared_ptr<Particles>& currVerts, std::shared_ptr<Particles>& prevVerts)
+{
+    Eigen::Matrix<T, 3, 1>& tri_vCurr0 = currVerts->pos[triFaceList[triIndex][0]];
+    Eigen::Matrix<T, 3, 1>& tri_vCurr1 = currVerts->pos[triFaceList[triIndex][1]];
+    Eigen::Matrix<T, 3, 1>& tri_vCurr2 = currVerts->pos[triFaceList[triIndex][2]];
+    Eigen::Matrix<T, 3, 1>& tri_vPrev0 = prevVerts->pos[triFaceList[triIndex][0]];
+    Eigen::Matrix<T, 3, 1>& tri_vPrev1 = prevVerts->pos[triFaceList[triIndex][1]];
+    Eigen::Matrix<T, 3, 1>& tri_vPrev2 = prevVerts->pos[triFaceList[triIndex][2]];
+
+    triAvgVel = ((tri_vCurr0 + tri_vCurr1 + tri_vCurr2) - (tri_vPrev0 + tri_vPrev1 + tri_vPrev2))/3.0;
+    triAvgVel.normalize();
+}
+
 //The ray in this function is not transformed because it was *already* transformed in Mesh::GetIntersection
 bool Triangles::intersect(const Ray &r, const int &triIndex, float *t, std::shared_ptr<Particles>& vertices, Eigen::Matrix<T, 3, 1> *baryCoords) const
 {
@@ -131,9 +144,9 @@ bool Triangles::intersect(const Ray &r, const int &triIndex, float *t, std::shar
     float s3 = 0.5f * length(cross(P - points[0], P - points[1]))/S;
     float sum = s1 + s2 + s3;
 
-    if(s1 >= 0 && s1 <= 1 && s2 >= 0 && s2 <= 1 && s3 >= 0 && s3 <= 1 && fequal(sum, 1.0f)) {
+    if(s1 >= 0 && s1 <= 1 && s2 >= 0 && s2 <= 1 && s3 >= 0 && s3 <= 1 && fequal(sum, 1.0f)) 
+    {
         *t = tnew;
-        //std::cout<<s1<<" "<<s2<<" "<<s3<<std::endl;
         (*baryCoords) << s1 , s2, s3;
         return true;
     }

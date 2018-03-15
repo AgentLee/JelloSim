@@ -12,6 +12,7 @@ struct Ray
 {
     Eigen::Matrix<T, 3, 1> origin;
     Eigen::Matrix<T, 3, 1> direction;
+    Ray(Eigen::Matrix<T, 3, 1> ro, Eigen::Matrix<T, 3, 1> rd): origin(ro), direction(rd) {}
 };
 
 struct Intersection
@@ -22,4 +23,6 @@ struct Intersection
     Eigen::Matrix<T, 3, 1> point;
     Eigen::Matrix<T, 3, 1> normal;
     Eigen::Matrix<T, 3, 1> BarycentricWeights;// Corresponding to every point that makes the triangle
+    Eigen::Matrix<T, 3, 1> penetrationDistance;
+    Eigen::Matrix<uint, 3, 1> vertsOfTriangle; //Vertices of the triangle that was intersected
 };

@@ -8,8 +8,7 @@ To convert an OBJ to poly, go to `main.cpp` and uncomment `#define CONVERT_OBJ_T
 
 And specify input file name and output file name as follows
 ```
-const std::string objToPolyNames[] = { "../Assets/objs_polys/INPUT.obj",
-                                       "../Assets/objs_polys/OUTPUT.poly" };
+const std::string objToPolyNames[] = { "../Assets/objs_polys/INPUT.obj", "../Assets/objs_polys/OUTPUT.poly" };
 ```
 
 

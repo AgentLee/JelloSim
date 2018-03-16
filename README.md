@@ -16,17 +16,19 @@ Refer to the file labeled "USAGE_INSTRUCTIONS" for how to use the Simulator.
 - [Aman Sachan](https://github.com/aman-sachan-asach)
 - [Jonathan Lee](https://github.com/agentlee)
 - [Rishabh Shah](https://github.com/rms13)
-- [Grover Chen](https://github.com/Groverc85)
+- [Jiongjian Chen](https://github.com/Groverc85)
 
 #### Skip Forward to:
 1. [Features](#Features)
-2. [Demos](#Demo)
-3. [Implementation Overview](#Implementation)
-4. [Algorithm Layout](#Algorithm)
-5. [Architecture](#Architecture)
+2. [Implementation Overview](#Implementation)
+3. [Algorithm Layout](#Algorithm)
+4. [Architecture](#Architecture)
+5. [Miscellaneous Demos](#Demo)
 6. [Future Work](#Future)
 7. [Limitations](#Limitations)
 8. [Resources](#Resources)
+9. [Credits](#Credits)
+10. [Bloopers](#Bloopers)
 
 ## Features <a name="Features"></a>
  - Finite Element Method with Fixed Corotated Elastic Model
@@ -34,33 +36,11 @@ Refer to the file labeled "USAGE_INSTRUCTIONS" for how to use the Simulator.
  - Fixed point constraints
  - Scene creation and Rendering
  - Mass Distribution across discretised mesh
- - Explicit Forward Euler integration scheme
+ - Symplectic Euler integration scheme
  - Data Driven Architecture that's easy to understand and extend
  - BGEO writing facilities
  - Obj to Poly file conversion utilities to make tetgen viable for meshes
  - Inter-Mesh Collisions (Work In Progress)
-
-## Demos <a name="Demo"></a>
-
-#### Jello Cube
-
-[![](./Images/JelloCubeLink.png)](https://vimeo.com/260041318)
-
-#### Changing Parameters
-
-[![](./Images/JelloCubeLink.png)](https://vimeo.com/260041318)
-
-#### Jello Bunny
-
-[![](./Images/bunnyBouncerLink.png)](https://vimeo.com/260037661)
-
-#### SDF Collisions
-
-[![](./Images/SDFCollisionsLink.png)](https://vimeo.com/260041595)
-
-#### Fixed Point Constraints
-
-[![](./Images/StickyBunLink.png)](https://vimeo.com/260161092)
 
 ## Implementation Overview <a name="Implementation"></a>
 
@@ -137,6 +117,16 @@ P is the Piola Kirchoff Stress Tensor that is a force computation model.
 
 H is a matrix of Forces on the individual vertices.
 
+#### Changing Parameters
+
+###### Jello Cubes with Youngs Modulus = 500k and Poisson's Ratios of 0.2, 0.3, and 0.4
+
+[![](./Images/p_2_3_4_y_500k.PNG)](https://drive.google.com/open?id=1KYE9ofo5ExvEMsCYECR2RNyoqpvpR2B6)
+
+###### Jello Cubes with Youngs Modului of 300k, 500k, and 700k and Poisson's Ratio = 0.3
+
+[![](./Images/p_3_y_300k_500k_700k.PNG)](https://drive.google.com/open?id=1BPLb0tByoddafk8D9QIiKTvPog0vGlaH)
+
 ### Collisions with rigid objects:
 
 [![](./Images/SDFCollisionsLink.png)](https://vimeo.com/260041595)
@@ -188,6 +178,8 @@ Vertex
 
 So now if you perform an operation on vertices that only needs to use position data. If you didn't have data driven architecture, less vertex positions fit into cache because theyre spaced out by other data like vel, force, and mass. This also leads to more chache misses. It also leads to memory not being continuous and having to jump around to get the next position data. 
 
+## Miscellaneous Demos <a name="Demo"></a>
+
 ## Future Work <a name="Future"></a>
 - Stable Inter-Mesh Collisions (Inter-Mesh Collisions is aa work in progress)
 - Parallelization through CUDA so that you can run it on the GPU
@@ -203,3 +195,17 @@ So now if you perform an operation on vertices that only needs to use position d
 - http://www.math.ucla.edu/~jteran/papers/ITF04.pdf
 - https://www.youtube.com/watch?v=BH1OrCtaPjo
 - https://www.youtube.com/watch?v=SACGMSZx4FY&t=1s
+
+## Credits <a name="Credits"></a>
+
+- _Aman Sachan_ : Base code, bgeo writer, obj writer, inter-mesh collisions, most of the core algorithm, bug fixing and restructuring (lots of it)
+
+- _Rishabh Shah_ : Base code, obj to poly converter for tetgen, tetgen, inter-mesh collisions, computation of piola-kirchhoff stress, bug fixing and restructuring (lots of it)
+
+- _Jon Lee_ : Base code, SDF collisions, bgeo/obj writer debugging, creating and rendering interesting scenes
+
+- _Jiongjian Chen_ : Symplectic Euler integration, Backward-Euler integration
+
+## Bloopers <a name="Bloopers"></a>
+
+[![](./Images/bloopers.png)](https://drive.google.com/open?id=1qqCth_n0zLGcSstoevafHsAkZ27BSKcm)

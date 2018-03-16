@@ -1,6 +1,8 @@
 Jello Simulator using FEM
 =========================
 
+[![](./Images/DemoLink.png)](https://vimeo.com/235422890)
+
 ## Overview
 This project implements a Jello Simulator using the Finite Element Method (FEM). The Finite Element method approximates the values of the unknowns (in this case, forces) at discrete points over the domain of the simulation. It does this by breaking down the problem into a number of really tiny simple problems, called finite elements. We treat these finite elements as their own systems that we solve individually to obtain a solution for the overall system. Because the finite element method uses approximations of the system at the discrete points its accuracy increase with smaller and smaller elements.
 
@@ -18,12 +20,13 @@ Refer to the file labeled "USAGE_INSTRUCTIONS" for how to use the Simulator.
 
 #### Skip Forward to:
 1. [Features](#Features)
-2. [Implementation Overview](#Implementation)
-3. [Algorithm Layout](#Algorithm)
-4. [Architecture](#Architecture)
-5. [Future Work](#Future)
-6. [Limitations](#Limitations)
-7. [Resources](#Resources)
+2. [Demos](#Demo)
+3. [Implementation Overview](#Implementation)
+4. [Algorithm Layout](#Algorithm)
+5. [Architecture](#Architecture)
+6. [Future Work](#Future)
+7. [Limitations](#Limitations)
+8. [Resources](#Resources)
 
 ## Features <a name="Features"></a>
  - Finite Element Method with Fixed Corotated Elastic Model
@@ -36,6 +39,13 @@ Refer to the file labeled "USAGE_INSTRUCTIONS" for how to use the Simulator.
  - BGEO writing facilities
  - Obj to Poly file conversion utilities to make tetgen viable for meshes
  - Inter-Mesh Collisions (Work In Progress)
+
+## Demos <a name="Demo"></a>
+
+#### Changing Parameters
+#### Jello Bunny
+#### SDF Collisions
+#### Fixed Point Constraints
 
 ## Implementation Overview <a name="Implementation"></a>
 

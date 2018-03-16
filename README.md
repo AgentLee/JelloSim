@@ -35,7 +35,7 @@ Refer to the file labeled "USAGE_INSTRUCTIONS" for how to use the Simulator.
  - Data Driven Architecture that's easy to understand and extend
  - BGEO writing facilities
  - Obj to Poly file conversion utilities to make tetgen viable for meshes
- - Inter-Mesh Collisions
+ - Inter-Mesh Collisions (Work In Progress)
 
 ## Implementation Overview <a name="Implementation"></a>
 
@@ -118,10 +118,32 @@ This is not physicall accurate but it is a nice approximation for the kind of ar
 
 Fixed Point Constraints are constraints that essentially just lock points (vertices in place). We create bounding volumes where ever we want the vertices to remain in place and then when updating the vertex's velocity, if the vertex lies inside the fixed region bounding box we set the velocity to zero. This ensures that the vertex's position doesn't move. 
 
+### Detecting Collisions between Meshes:
+
+### Resolving Collisions between Meshes:
+
 ## Architecture <a name="Architecture"></a>
 
+We use a data-driven architecture for the simulation, and one of the most important things for that in terms of our code was creating structs/classes of arrays instead of arrays of structs. This means that there is an array of positions which stores all the positions of the vertices in a single array. Similarly, there are arrays for previous positions, velocities, forces, etc. The stark difference is easy to see when you know the alternate is having an array of Particles, where each Particle stores its position, its velocity, its previous position, its force, etc.
+
+The reason our architecture is superior and will be faster then the alternative is because whenever we are working with vertices if we dont need all of the information of that particle then its useless loading the un-needed data in. In fact its worse than useless it actively slows down processing speeds. Consider this example:
+
+Array of Struct, struct layout:
+```
+Vertex
+{
+   vec3 pos;
+   vec3 vel;
+   vec3 force;
+   float mass;
+}
+```
+
+So now if you perform an operation on vertices that only needs to use position data. If you didn't have data driven architecture, less vertex positions fit into cache because theyre spaced out by other data like vel, force, and mass. This also leads to more chache misses. It also leads to memory not being continuous and having to jump around to get the next position data. 
+
 ## Future Work <a name="Future"></a>
- - Parallelization through CUDA so that you can run it on the GPU
+- Stable Inter-Mesh Collisions (Inter-Mesh Collisions is aa work in progress)
+- Parallelization through CUDA so that you can run it on the GPU
 
 ## Limitations <a name="Limitations"></a>
  - Not energy conserving -- the mesh does not keep bouncing forever

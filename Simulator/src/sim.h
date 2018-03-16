@@ -41,7 +41,7 @@ public:
 	void SDF_Collisions(float dt, uint j);
 	void fixParticlePosition( Eigen::Matrix<T, 3, 1>& particleVel, Eigen::Matrix<T, 3, 1>& particlePos );
 	void Mesh_Collisions(float dt, uint i, uint j, std::shared_ptr<Particles>& vertices, int particleIndex, bool& collided);
-	void resolveCollisions( std::shared_ptr<Triangles>& triangles, std::shared_ptr<Particles>& vertices, 
+	void resolveCollisions( std::shared_ptr<Triangles>& triangles, std::shared_ptr<Particles>& vertices,
 							Intersection& isect, Eigen::Matrix<T, 3, 1>& displacement,
 							Eigen::Matrix<T, 3, 1>& particlePos, Eigen::Matrix<T, 3, 1>& particleVel );
 

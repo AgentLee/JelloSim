@@ -1,16 +1,11 @@
 #include <Partio.h>
 #include <Eigen/Core>
 #include <Eigen/Dense>
-#include <vector>
-#include <string>
 
 #include <memory>
-#include <iostream>
-#include <time.h>
 
 #include "src/particles.h"
 #include "src/triangles.h"
-#include "src/tetrahedrons.h"
 #include "src/mesh.h"
 #include "src/utilities.h"
 #include "src/sim.h"
@@ -67,11 +62,13 @@ void createScene( std::vector<std::shared_ptr<Mesh>>& MeshList )
 		cube2->translateMesh(translation);
 		MeshList.push_back(cube2);
 	}
+
+    std::cout << "Num Meshes " << MeshList.size() << std::endl;
 }
 
 void writeBGEOsforMeshes( std::vector<std::shared_ptr<Mesh>>& MeshList, int frameNumber )
 {
-	std::cout << "Simualting Frame: " << frameNumber << "..." << std::endl;
+	std::cout << "Simualted Frame: " << frameNumber << std::endl;
 	for(uint i=0; i<MeshList.size(); i++)
 	{
 		Utils::writeBGEOforFrame( bgeoFileNames[i], frameNumber, MeshList[i]->vertices );
@@ -96,8 +93,6 @@ int main(int argc, char* argv[])
 	
 	std::shared_ptr<Sim> sim = std::make_shared<Sim>( MeshList );
 	sim->init();
-
-	std::cout << "Num Meshes " << MeshList.size() << std::endl;
 
 	//Main Loop of Jello Sim
 	for(int i=beginFrame; i<=endFrame; i++)

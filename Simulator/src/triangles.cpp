@@ -133,7 +133,6 @@ bool Triangles::intersect(const Ray &r, const int &triIndex, float *t, std::shar
 
     if(s1 >= 0 && s1 <= 1 && s2 >= 0 && s2 <= 1 && s3 >= 0 && s3 <= 1 && fequal(sum, 1.0f)) {
         *t = tnew;
-        //std::cout<<s1<<" "<<s2<<" "<<s3<<std::endl;
         (*baryCoords) << s1 , s2, s3;
         return true;
     }

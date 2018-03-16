@@ -33,11 +33,7 @@ void Sim::init()
 
 			tetras->addMass( i, vertices );
 		}
-
-//        std::cout << MeshList[j]->AABB.min[0] << " " << MeshList[j]->AABB.min[1] << " " << MeshList[j]->AABB.min[2] << std::endl;
-//        std::cout << MeshList[j]->AABB.max[0] << " " << MeshList[j]->AABB.max[1] << " " << MeshList[j]->AABB.max[2] << std::endl;
 	}
-
 }
 
 void Sim::clean()
@@ -76,11 +72,9 @@ void Sim::eulerIntegrationWithCollisionTesting(float dt)
 	}
 
     uint j = 0;
-	//for(uint j=0; j<MeshList.size(); j++)
 	{
 		//Check if this mesh's AABB is intersecting with any other mesh's AABB
         uint i = 1;
-		//for(uint i=0; i<MeshList.size() && i!=j; i++)
 		{
 			bool intersects = Intersect_AABB_with_AABB( MeshList[j]->AABB, MeshList[i]->AABB );
 			
@@ -100,9 +94,6 @@ void Sim::eulerIntegrationWithCollisionTesting(float dt)
 						vertices->updateParticleVelocity(dt, k);
 						vertices->updateParticlePosition(dt, k);
 					}
-
-//                    Point3f p;
-//                    p << vertices->pos[k][0], vertices->pos[k][1], vertices->pos[k][2];
 				}
 			}
 		}
@@ -216,17 +207,6 @@ void Sim::resolveCollisions( std::shared_ptr<Triangles>& triangles, std::shared_
 		//---------------- Setting Positions ---------------------------------
 		particlePos = isect.point.cast<T>() - 0.01*displacement; // 1/4th to moving vertex
 		//displacement = 0.75f*displacement;				// 3/4th to moving triangle
-
-		// move vertices of triangle according to barycentric weights
-//		vertices->pos[verticesOfTriangle[0]] += isect.BarycentricWeights[0] * displacement;
-//		vertices->pos[verticesOfTriangle[1]] += isect.BarycentricWeights[1] * displacement;
-//		vertices->pos[verticesOfTriangle[2]] += isect.BarycentricWeights[2] * displacement;
-
-//        std::cout<< "disp: " << displacement << std::endl;
-//        std::cout<< "0: " << isect.BarycentricWeights[0] << std::endl;
-//        std::cout<< "1: " << isect.BarycentricWeights[1] << std::endl;
-//        std::cout<< "2: " << isect.BarycentricWeights[2] << std::endl;
-
 	}
 	if(SET_VELOCITIES)
 	{
@@ -236,9 +216,6 @@ void Sim::resolveCollisions( std::shared_ptr<Triangles>& triangles, std::shared_
 		vertices->vel[verticesOfTriangle[0]] = Eigen::Matrix<T, 3, 1>::Zero();
 		vertices->vel[verticesOfTriangle[1]] = Eigen::Matrix<T, 3, 1>::Zero();
 		vertices->vel[verticesOfTriangle[2]] = Eigen::Matrix<T, 3, 1>::Zero();
-	}
-	if(PAPER)
-	{
 	}
 }
 
@@ -285,9 +262,6 @@ void Sim::Mesh_Collisions(float dt, uint i, uint j, std::shared_ptr<Particles>& 
 		Eigen::Matrix<T, 3, 1> displacement;
         displacement = projectedPos - vertices->pos[particleIndex];
 
-		//resolveCollisions( MeshList[1]->triangles, MeshList[1]->vertices, isect, displacement,
-		//				vertices->pos[particleIndex], vertices->vel[particleIndex] );
-
         // set position or velocity or both OR use momentum OR use paper's implementation with normal reaction forces and friction
         Eigen::Matrix<uint, 3, 1> verticesOfTriangle;
         verticesOfTriangle = triangles->triFaceList[isect.triangleIndex];
@@ -297,17 +271,6 @@ void Sim::Mesh_Collisions(float dt, uint i, uint j, std::shared_ptr<Particles>& 
             //---------------- Setting Positions ---------------------------------
             MeshList[1]->vertices->pos[particleIndex] = isect.point.cast<T>() - 0.01*displacement; // 1/4th to moving vertex
             //displacement = 0.75f*displacement;				// 3/4th to moving triangle
-
-            // move vertices of triangle according to barycentric weights
-//		vertices->pos[verticesOfTriangle[0]] += isect.BarycentricWeights[0] * displacement;
-//		vertices->pos[verticesOfTriangle[1]] += isect.BarycentricWeights[1] * displacement;
-//		vertices->pos[verticesOfTriangle[2]] += isect.BarycentricWeights[2] * displacement;
-
-//        std::cout<< "disp: " << displacement << std::endl;
-//        std::cout<< "0: " << isect.BarycentricWeights[0] << std::endl;
-//        std::cout<< "1: " << isect.BarycentricWeights[1] << std::endl;
-//        std::cout<< "2: " << isect.BarycentricWeights[2] << std::endl;
-
         }
         if(SET_VELOCITIES)
         {
@@ -318,12 +281,6 @@ void Sim::Mesh_Collisions(float dt, uint i, uint j, std::shared_ptr<Particles>& 
             MeshList[0]->vertices->vel[verticesOfTriangle[1]] = Eigen::Matrix<T, 3, 1>::Zero();
             MeshList[0]->vertices->vel[verticesOfTriangle[2]] = Eigen::Matrix<T, 3, 1>::Zero();
         }
-        if(PAPER)
-        {
-        }
-
-
-
 		collided = true;
 	}
 }

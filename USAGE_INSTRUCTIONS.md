@@ -54,12 +54,9 @@ Then in `void createScene()` initialize all the meshes with initial translation 
 ## Controllable Parameters
 `gridCellSize, density, poissonsRatio, and youngsModulus` control the properties of semi-solids in FEM simulation. You can easily change these using globals in `main.cpp`. For a simulation with multiple meshes with different properties, simply set them in `void createScene()` instead of using the globals.
 
-While the inter-object collisions don't work yet, in `sim.cpp`, to toggle interobject collision related settings, change
+While the inter-object collisions don't work yet, you can check out the current progress in `collisions` branch. To toggle interobject collision related settings, in `sim.cpp`, change
 ```
 #define SET_POSITIONS 1
 #define SET_VELOCITIES 1
 #define INTER_OBJECT_COLLISIONS 1
 ```
-
-
-

@@ -120,7 +120,19 @@ Fixed Point Constraints are constraints that essentially just lock points (verti
 
 ### Detecting Collisions between Meshes:
 
-### Resolving Collisions between Meshes:
+To determine if we even have to perform intermesh collisions we check if the Axis Aligned Bounding Boxes of the meshes intersect. If they do then there are 2 cases we need to watch out for when doing Inter-Mesh Collisions namely Vertex moving through a Triangle and Triangle engulfing a Vertex.
+
+#### Vertex moving through a Triangle
+
+This is the standard case of a moving mesh colliding into anything. We loop through its vertices and perform triangle intersection tests to determine if the line traced by the vertex from its previous position to its current position intersects a triangle on a possibly colliding mesh.
+
+#### Triangle engulfing a Vertex
+
+In this test case the vertex remains at its current position and we move the triangle between its previous position and its urrent position. If we shoot a ray starting at the vertex, moving in the opposite direction of the velocity of the triangle. If it hits the triangle in its previous position, we shoot another ray. This second ray is shot starting from the vertex, moving in the direction of the velocity of the triangle. If this ray also hits the triangle in its current position, then we can assume that the vertex has been engulfed by the triangle.
+
+### Resolving Collisions between Meshes (Work In Progress):
+
+To resolve collisions we are trying a combination of position offsets and velocity changes for the vertex in question and the vertices of the triangle the vertex collides with.
 
 ## Architecture <a name="Architecture"></a>
 

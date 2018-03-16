@@ -1,7 +1,7 @@
 Jello Simulator using FEM
 =========================
 
-[![](./Images/DemoLink.png)](https://vimeo.com/235422890)
+[![](./Images/bunnyBouncerLink.png)](https://vimeo.com/260037661)
 
 ## Overview
 This project implements a Jello Simulator using the Finite Element Method (FEM). The Finite Element method approximates the values of the unknowns (in this case, forces) at discrete points over the domain of the simulation. It does this by breaking down the problem into a number of really tiny simple problems, called finite elements. We treat these finite elements as their own systems that we solve individually to obtain a solution for the overall system. Because the finite element method uses approximations of the system at the discrete points its accuracy increase with smaller and smaller elements.
@@ -43,8 +43,6 @@ Refer to the file labeled "USAGE_INSTRUCTIONS" for how to use the Simulator.
  - Inter-Mesh Collisions (Work In Progress)
 
 ## Implementation Overview <a name="Implementation"></a>
-
-[![](./Images/bunnyBouncerLink.png)](https://vimeo.com/260037661)
 
 The simulation works by applying forces to the individual vertices of that make up the mesh. These vertices exist through out the entire volume of the mesh and not just on it's surface. The forces are then used to update the velocities and then positions of the vertices in the Euler Integration Step. Because the vertices have changed positions the triangles that represent the surface of the mesh have also changed in size, shape, and position. This is what is seen as the elastic deformation that occurs on the model.
 

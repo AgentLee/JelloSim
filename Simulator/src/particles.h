@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 
+#include <cmath>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -10,6 +11,11 @@
 
 #include <stdlib.h>
 #include <time.h>
+
+#include <GL/glew.h>
+#include <GLM/glm.hpp>
+#include <GLM/gtc/matrix_transform.hpp>
+#include <GLM/gtc/type_ptr.hpp>
 
 using T = double;
 constexpr int dim = 3;
@@ -41,4 +47,15 @@ public:
 	void tetgen_readNode(const std::string &inputFileName);
 
 	void writePartio(std::string particleFile);
+
+	void computeForce(int index);
+
+	const T Ks = 1.0;
+	const T Kd = 1.0;
+
+	T mass_damping = 2.0;
+	glm::vec3 X, V, F, Vnew;
+	glm::mat3 kMat, mMat; 
+	std::vector<glm::mat3> dForceDX;      // Implicit Modified Backward Euler, ∂F/∂X, Partial Differential (ΔForces / ΔPositions)
+	std::vector<glm::mat3> dForceDV;      // Implicit Modified Backward Euler, ∂F/∂V, Partial Differential (ΔForces / ΔVelocitys)
 };

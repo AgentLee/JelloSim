@@ -62,6 +62,8 @@ void Sim::eulerIntegration(float dt)
 		std::shared_ptr<Particles> vertices = MeshList[i]->vertices;
 		vertices->updateAllParticleVelocities(dt);
 		vertices->updateAllParticlePositions(dt);
+		// vertices->updateAllParticleVelocitiesBackwardEuler(dt);
+		// vertices->updateAllParticlePositionsBackwardEuler(dt);
 	}
 }
 
@@ -74,6 +76,8 @@ void Sim::eulerIntegrationWithCollisionTesting(float dt)
 		std::shared_ptr<Particles> vertices = MeshList[i]->vertices;
 		vertices->updateAllParticleVelocities(dt);
 		vertices->updateAllParticlePositions(dt);
+		// vertices->updateAllParticleVelocitiesBackwardEuler(dt);
+		// vertices->updateAllParticlePositionsBackwardEuler(dt);
 	}
 
     uint j = 0;
@@ -100,6 +104,8 @@ void Sim::eulerIntegrationWithCollisionTesting(float dt)
 					{
 						vertices->updateParticleVelocity(dt, k);
 						vertices->updateParticlePosition(dt, k);
+						// vertices->updateParticleVelocityBackwardEuler(dt, k);
+						// vertices->updateParticlePositionBackwardEuler(dt, k);
 					}
 
 //                    Point3f p;

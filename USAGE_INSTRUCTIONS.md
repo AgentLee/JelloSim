@@ -13,27 +13,22 @@ const std::string objToPolyNames[] = { "../Assets/objs_polys/INPUT.obj", "../Ass
 
 
 ## Generating BGEOs for Multiple Files
-Our code can simulate multiple simulations simultaneously. 
+Our code can run multiple simulations simultaneously. 
 
 For simulating multiple meshes, multiple inputs are required. This is achieved as follows
 
 In `main.cpp`
 ```
 // .node files have the vertex data
-const std::string nodeFileNames[] = { "../Assets/Meshes/cube_poly_0.001/cube.1.node",
-									  "../Assets/Meshes/cube_poly_0.5/cube.1.node" };
+const std::string nodeFileNames[] = { "../Assets/Meshes/cube_poly_0.001/cube.1.node", "../Assets/Meshes/cube_poly_0.5/cube.1.node" };
 // .face files have the data about the triangles of the hull of the meshes
-const std::string faceFileNames[] = { "../Assets/Meshes/cube_poly_0.001/cube.1.face",
-									  "../Assets/Meshes/cube_poly_0.5/cube.1.face" };
+const std::string faceFileNames[] = { "../Assets/Meshes/cube_poly_0.001/cube.1.face", "../Assets/Meshes/cube_poly_0.5/cube.1.face" };
 // .ele files have the data of all the tetrahedra in the meshes
-const std::string eleFileNames[]  = { "../Assets/Meshes/cube_poly_0.001/cube.1.ele",
-									  "../Assets/Meshes/cube_poly_0.5/cube.1.ele"};
+const std::string eleFileNames[]  = { "../Assets/Meshes/cube_poly_0.001/cube.1.ele", "../Assets/Meshes/cube_poly_0.5/cube.1.ele"};
 // .obj files are generated for visualization with houdini
-const std::string objFileNames[]  = { "../Assets/OBJs/FirstCube.obj",
-									  "../Assets/OBJs/SecondCube.obj" };
+const std::string objFileNames[]  = { "../Assets/OBJs/FirstCube.obj", "../Assets/OBJs/SecondCube.obj" };
 // .bgeo files are used to visualize per point data for every frame in houdini
-const std::string bgeoFileNames[] = { "../Assets/BGEOs/jelloCube1Frame",
-									  "../Assets/BGEOs/jelloCube2Frame" };
+const std::string bgeoFileNames[] = { "../Assets/BGEOs/jelloCube1Frame", "../Assets/BGEOs/jelloCube2Frame" };
 ```
 
 Then in `void createScene()` initialize all the meshes with initial translation and other simulation parameters by creating a new shared pointer for Mesh class

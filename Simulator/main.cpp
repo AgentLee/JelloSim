@@ -27,14 +27,19 @@ constexpr float density = 1000.f;
 constexpr float youngsModulus = 500000.0f;
 constexpr float poissonsRatio = 0.3f;
 
+// .node files have the vertex data
 const std::string nodeFileNames[] = { "../Assets/Meshes/cube_poly_0.001/cube.1.node",
 									  "../Assets/Meshes/cube_poly_0.001/cube.1.node" };
+// .face files have the data about the triangles of the hull of the meshes
 const std::string faceFileNames[] = { "../Assets/Meshes/cube_poly_0.001/cube.1.face",
 									  "../Assets/Meshes/cube_poly_0.001/cube.1.face" };
+// .ele files have the data of all the tetrahedra in the meshes
 const std::string eleFileNames[]  = { "../Assets/Meshes/cube_poly_0.001/cube.1.ele",
 									  "../Assets/Meshes/cube_poly_0.001/cube.1.ele"};
+// .obj files are generated for visualization with houdini
 const std::string objFileNames[]  = { "../Assets/OBJs/FirstCube.obj",
 									  "../Assets/OBJs/SecondCube.obj" };
+// .bgeo files are used to visualize per point data for every frame in houdini
 const std::string bgeoFileNames[] = { "../Assets/BGEOs/jelloCube1Frame",
 									  "../Assets/BGEOs/jelloCube2Frame" };
 

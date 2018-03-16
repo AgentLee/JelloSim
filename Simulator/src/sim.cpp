@@ -6,8 +6,7 @@
 
 #define SET_POSITIONS 1
 #define SET_VELOCITIES 1
-#define PAPER 0
-#define INTER_OBJECT_COLLISIONS 1
+#define INTER_OBJECT_COLLISIONS 0
 
 Sim::Sim( std::vector<std::shared_ptr<Mesh>>& MeshList ) : MeshList(MeshList)
 {}

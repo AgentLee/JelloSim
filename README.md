@@ -103,12 +103,20 @@ For every Mesh in the Simulation
 ```
 
 F can be thought of as the Transformation Matrix that converts the Undeformed tetrahedron into the Deformed Tetrahedron.
+
 P is the Piola Kirchoff Stress Tensor that is a force computation model.
+
 H is a matrix of Forces on the individual vertices.
 
 ### Collisions with rigid objects:
+
+We represent the rigid objects in the scene as [Signed Distance Fields (SDF's)](https://cis700-procedural-graphics.github.io/files/implicit_surfaces_2_21_17.pdf). We can use SDF's to tell us how far away we are from a rigid body (or the ground). This means we can also tell when we are inside a rigid body. Our approach to making Elastic substances bounce off of rigid body objects is to simply set the velocity of the vertex that collided or even went inside a rigid body to zero. We essentially made it so that the vertex moves really slowly but in the same direction compared to the ones around it (the ones that didn't collided or intersect a rigid body). This leads to a deformation of that tetrahedron which leads to deformation forces that ripple through the entire mesh.
+
+This is not physicall accurate but it is a nice approximation for the kind of artistic effect we wanted. It is also incredibly fast. The physically correct way to handle this would be to consider momentum transfer between the jello and the rigid body.
+
 ### Fixed Point Constraints:
 
+Fixed Point Constraints are constraints that essentially just lock points (vertices in place). We create bounding volumes where ever we want the vertices to remain in place and then when updating the vertex's velocity, if the vertex lies inside the fixed region bounding box we set the velocity to zero. This ensures that the vertex's position doesn't move. 
 
 ## Architecture <a name="Architecture"></a>
 

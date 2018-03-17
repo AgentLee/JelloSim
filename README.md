@@ -119,11 +119,11 @@ H is a matrix of Forces on the individual vertices.
 
 #### Changing Parameters
 
-#### Jello Cube with Youngs Modulus = 500k and Poisson's Ratios of 2, 3, and 4
+###### Jello Cube with Youngs Modulus = 500k and Poisson's Ratios of 2, 3, and 4
 
 [![](./Images/p_2_3_4_y_500k.PNG)](https://drive.google.com/open?id=1KYE9ofo5ExvEMsCYECR2RNyoqpvpR2B6)
 
-#### Jello Cube with Youngs Modului of 300k, 500k, and 700k and Poisson's Ratio = 3
+###### Jello Cube with Youngs Modului of 300k, 500k, and 700k and Poisson's Ratio = 3
 
 [![](./Images/p_3_y_300k_500k_700k.PNG)](https://drive.google.com/open?id=1BPLb0tByoddafk8D9QIiKTvPog0vGlaH)
 

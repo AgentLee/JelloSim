@@ -42,12 +42,29 @@ Refer to the file labeled "USAGE_INSTRUCTIONS" for how to use the Simulator.
 
 ## Demos <a name="Demo"></a>
 
+#### Jello Cube
+
+[![](./Images/JelloCubeLink.png)](https://vimeo.com/260041318)
+
 #### Changing Parameters
+
+[![](./Images/JelloCubeLink.png)](https://vimeo.com/260041318)
+
 #### Jello Bunny
+
+[![](./Images/bunnyBouncerLink.png)](https://vimeo.com/260037661)
+
 #### SDF Collisions
+
+[![](./Images/SDFCollisionsLink.png)](https://vimeo.com/260041595)
+
 #### Fixed Point Constraints
 
+[![](./Images/StickyBunLink.png)](https://vimeo.com/260161092)
+
 ## Implementation Overview <a name="Implementation"></a>
+
+[![](./Images/bunnyBouncerLink.png)](https://vimeo.com/260037661)
 
 The simulation works by applying forces to the individual vertices of that make up the mesh. These vertices exist through out the entire volume of the mesh and not just on it's surface. The forces are then used to update the velocities and then positions of the vertices in the Euler Integration Step. Because the vertices have changed positions the triangles that represent the surface of the mesh have also changed in size, shape, and position. This is what is seen as the elastic deformation that occurs on the model.
 
@@ -58,6 +75,8 @@ So, far we have talked about the Mesh as a single system, but because we are usi
 The finer the tetrahedrons that make up the mesh the slower but also more accurate the resulting simulation will be.
 
 ### Algorithm Layout <a name="Algorithm"></a>
+
+[![](./Images/JelloCubeLink.png)](https://vimeo.com/260041318)
 
 The algorithm can be broken down into a _Preprocess Step_ and an _Update Loop_.
 
@@ -120,17 +139,23 @@ H is a matrix of Forces on the individual vertices.
 
 ### Collisions with rigid objects:
 
+[![](./Images/SDFCollisionsLink.png)](https://vimeo.com/260041595)
+
 We represent the rigid objects in the scene as [Signed Distance Fields (SDF's)](https://cis700-procedural-graphics.github.io/files/implicit_surfaces_2_21_17.pdf). We can use SDF's to tell us how far away we are from a rigid body (or the ground). This means we can also tell when we are inside a rigid body. Our approach to making Elastic substances bounce off of rigid body objects is to simply set the velocity of the vertex that collided or even went inside a rigid body to zero. We essentially made it so that the vertex moves really slowly but in the same direction compared to the ones around it (the ones that didn't collided or intersect a rigid body). This leads to a deformation of that tetrahedron which leads to deformation forces that ripple through the entire mesh.
 
 This is not physicall accurate but it is a nice approximation for the kind of artistic effect we wanted. It is also incredibly fast. The physically correct way to handle this would be to consider momentum transfer between the jello and the rigid body.
 
 ### Fixed Point Constraints:
 
+[![](./Images/StickyBunLink.png)](https://vimeo.com/260161092)
+
 Fixed Point Constraints are constraints that essentially just lock points (vertices in place). We create bounding volumes where ever we want the vertices to remain in place and then when updating the vertex's velocity, if the vertex lies inside the fixed region bounding box we set the velocity to zero. This ensures that the vertex's position doesn't move. 
 
 ### Detecting Collisions between Meshes:
 
 To determine if we even have to perform intermesh collisions we check if the Axis Aligned Bounding Boxes of the meshes intersect. If they do then there are 2 cases we need to watch out for when doing Inter-Mesh Collisions namely Vertex moving through a Triangle and Triangle engulfing a Vertex.
+
+![](./Images/collisiondetection.png)
 
 #### Vertex moving through a Triangle
 

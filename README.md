@@ -28,6 +28,7 @@ Refer to the file labeled "USAGE_INSTRUCTIONS" for how to use the Simulator.
 7. [Limitations](#Limitations)
 8. [Resources](#Resources)
 9. [Credits](#Credits)
+10. [Bloopers](#Bloopers)
 
 ## Features <a name="Features"></a>
  - Finite Element Method with Fixed Corotated Elastic Model
@@ -35,7 +36,7 @@ Refer to the file labeled "USAGE_INSTRUCTIONS" for how to use the Simulator.
  - Fixed point constraints
  - Scene creation and Rendering
  - Mass Distribution across discretised mesh
- - Explicit Forward Euler integration scheme
+ - Symplectic Euler integration scheme
  - Data Driven Architecture that's easy to understand and extend
  - BGEO writing facilities
  - Obj to Poly file conversion utilities to make tetgen viable for meshes
@@ -173,9 +174,13 @@ So now if you perform an operation on vertices that only needs to use position d
 
 ## Miscellaneous Demos <a name="Demo"></a>
 
-#### Jello Cube
+#### Jello Cube with Youngs Modulus = 500k and Poisson's Ratios of 2, 3, and 4
 
-[![](./Images/JelloCubeLink.png)](https://vimeo.com/260041318)
+[![](./Images/p_2_3_4_y_500k.PNG)](https://drive.google.com/open?id=1KYE9ofo5ExvEMsCYECR2RNyoqpvpR2B6)
+
+#### Jello Cube with Youngs Modului of 300k, 500k, and 700k and Poisson's Ratio = 3
+
+[![](./Images/p_3_y_300k_500k_700k.PNG)](https://drive.google.com/open?id=1BPLb0tByoddafk8D9QIiKTvPog0vGlaH)
 
 ## Future Work <a name="Future"></a>
 - Stable Inter-Mesh Collisions (Inter-Mesh Collisions is aa work in progress)
@@ -203,3 +208,6 @@ So now if you perform an operation on vertices that only needs to use position d
 
 - _Jiongjian Chen_ : Symplectic Euler integration, Backward-Euler integration
 
+## Bloopers <a name="Bloopers"></a>
+
+[![](./Images/bloopers.png)](https://drive.google.com/open?id=1qqCth_n0zLGcSstoevafHsAkZ27BSKcm)

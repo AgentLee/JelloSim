@@ -25,6 +25,7 @@ public:
 	std::vector<Eigen::Matrix<T, 3, 1>> vel;
 	std::vector<Eigen::Matrix<T, 3, 1>> pos;
 	std::vector<Eigen::Matrix<T, 3, 1>> force;
+	std::vector<Eigen::Matrix<T, 3, 1>> color;
 
 	Particles(int n, T initialMass);
 	void updateAllParticlePositions(T dt);

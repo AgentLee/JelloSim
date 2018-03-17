@@ -58,10 +58,11 @@ void Tetrahedrons::addMass( uint tetraIndex, std::shared_ptr<Particles> vertices
 }
 
 Eigen::Matrix<T, 3, 3> Tetrahedrons::computeF( uint tetraIndex, Eigen::Matrix<T, 3, 3>& Ds )
-{
+{   
+    //F can be thought of as the Transformation Matrix that converts the Undeformed tetrahedron into the Deformed Tetrahedron
     Eigen::Matrix<T, 3, 3> F = Ds * restInverseDeformation[tetraIndex];
 
-    // HACK to prevent FPN error from building up 
+    // HACK to prevent Floating Point error from building up 
     for(int j = 0; j < 3; ++j) {
         for(int i = 0; i < 3; ++i) {
             if(std::abs(F(i,j)) < 1e-10) {

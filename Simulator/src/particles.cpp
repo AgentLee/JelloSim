@@ -15,6 +15,9 @@ Particles::Particles(int n, T initialMass): numParticles(n)
 
         Eigen::Matrix<T, 3, 1> force_particle = Eigen::Matrix<T, 3, 1>::Zero();
         force.push_back(force_particle);
+
+        Eigen::Matrix<T, 3, 1> c = Eigen::Matrix<T, 3, 1>::Zero();
+        color.push_back(c);
     }
 }
 
@@ -105,6 +108,7 @@ void Particles::tetgen_readNode(const std::string &inputFileName)
         vel.resize(numPoints, Eigen::Matrix<T, 3, 1>::Zero());
         pos.resize(numPoints);
         force.resize(numPoints);
+        color.resize(numPoints);
 
         for(int i = 0; i < numPoints; ++i)
         {

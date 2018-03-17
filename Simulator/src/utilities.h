@@ -23,10 +23,11 @@ namespace Utils
 	void inline writePartio(std::string& particleFile, std::shared_ptr<Particles> vertices, int numVertices)
 	{
 		Partio::ParticlesDataMutable* parts = Partio::create();
-		Partio::ParticleAttribute posH, vH, mH;
+		Partio::ParticleAttribute posH, vH, mH, col;
 		mH = parts->addAttribute("m", Partio::VECTOR, 1);
 		posH = parts->addAttribute("position", Partio::VECTOR, 3);
 		vH = parts->addAttribute("v", Partio::VECTOR, 3);
+		col = parts->addAttribute("c", Partio::VECTOR, 3);
 
 		for (int i=0; i<numVertices; i++)
 		{
@@ -34,12 +35,14 @@ namespace Utils
 			float* m = parts->dataWrite<float>(mH, idx);
 			float* p = parts->dataWrite<float>(posH, idx);
 			float* v = parts->dataWrite<float>(vH, idx);
+			float* c = parts->dataWrite<float>(col, idx);
 
 			m[0] = vertices->mass[0];
 			for (uint k = 0; k < 3; k++)
 			{
 				p[k] = vertices->pos[i][k];
 				v[k] = vertices->vel[i][k];
+				c[k] = vertices->color[i][k];
 			}
 		}
 

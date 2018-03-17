@@ -25,4 +25,5 @@ struct Intersection
     Eigen::Matrix<T, 3, 1> BarycentricWeights;// Corresponding to every point that makes the triangle
     Eigen::Matrix<T, 3, 1> penetrationDistance;
     Eigen::Matrix<uint, 3, 1> vertsOfTriangle; //Vertices of the triangle that was intersected
+    Eigen::Matrix<T, 3, 1> color;
 };

@@ -193,12 +193,17 @@ void Sim::Collisions(float dt)
                             // Eigen::Matrix<T, 3, 1> reflected;
                             // reflected = d - 2.0f*(d.dot(normal))*normal;
                             // newVelocities[i][k] = reflected;//Eigen::Matrix<T, 3, 1>::Zero();
-                            newVelocities[i][k] = fallingMesh->vertices->vel[k];
+                            newVelocities[i][k] = Eigen::Matrix<T, 3, 1>::Zero();
 
                             newVelocities[j][isect.vertsOfTriangle[0]] += fallingMesh->vertices->vel[k];
                             newVelocities[j][isect.vertsOfTriangle[1]] += fallingMesh->vertices->vel[k];
                             newVelocities[j][isect.vertsOfTriangle[2]] += fallingMesh->vertices->vel[k];
                         }
+
+                        fallingMesh->vertices->color[k] = isect.color;
+                        standingMesh->vertices->color[isect.vertsOfTriangle[0]] = isect.color;
+                        standingMesh->vertices->color[isect.vertsOfTriangle[1]] = isect.color;
+                        standingMesh->vertices->color[isect.vertsOfTriangle[2]] = isect.color;
                     }
                 }
             }
@@ -251,6 +256,7 @@ bool Sim::IntersectionTesting(std::shared_ptr<Mesh> meshA, std::shared_ptr<Mesh>
             isect->point = forwardRay.origin + tTemp * forwardRay.direction;
             isect->penetrationDistance = tTemp * forwardRay.direction;
             isect->vertsOfTriangle = meshB->triangles->triFaceList[i];
+            isect->color << 1.0f, 0.0f, 0.0f;
         }
 
         //------------------------------------------------------//
@@ -277,6 +283,7 @@ bool Sim::IntersectionTesting(std::shared_ptr<Mesh> meshA, std::shared_ptr<Mesh>
                 isect->point = rayTVB.origin + tTemp * rayTVB.direction;
                 isect->penetrationDistance = tTemp * rayTVB.direction;
                 isect->vertsOfTriangle = meshB->triangles->triFaceList[i];
+                isect->color << 0.0f, 0.0f, 1.0f;
             }
         }
     }

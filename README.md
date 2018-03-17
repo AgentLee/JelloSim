@@ -119,7 +119,13 @@ H is a matrix of Forces on the individual vertices.
 
 #### Changing Parameters
 
-[![](./Images/JelloCubeLink.png)](https://vimeo.com/260041318)
+#### Jello Cube with Youngs Modulus = 500k and Poisson's Ratios of 2, 3, and 4
+
+[![](./Images/p_2_3_4_y_500k.PNG)](https://drive.google.com/open?id=1KYE9ofo5ExvEMsCYECR2RNyoqpvpR2B6)
+
+#### Jello Cube with Youngs Modului of 300k, 500k, and 700k and Poisson's Ratio = 3
+
+[![](./Images/p_3_y_300k_500k_700k.PNG)](https://drive.google.com/open?id=1BPLb0tByoddafk8D9QIiKTvPog0vGlaH)
 
 ### Collisions with rigid objects:
 
@@ -173,14 +179,6 @@ Vertex
 So now if you perform an operation on vertices that only needs to use position data. If you didn't have data driven architecture, less vertex positions fit into cache because theyre spaced out by other data like vel, force, and mass. This also leads to more chache misses. It also leads to memory not being continuous and having to jump around to get the next position data. 
 
 ## Miscellaneous Demos <a name="Demo"></a>
-
-#### Jello Cube with Youngs Modulus = 500k and Poisson's Ratios of 2, 3, and 4
-
-[![](./Images/p_2_3_4_y_500k.PNG)](https://drive.google.com/open?id=1KYE9ofo5ExvEMsCYECR2RNyoqpvpR2B6)
-
-#### Jello Cube with Youngs Modului of 300k, 500k, and 700k and Poisson's Ratio = 3
-
-[![](./Images/p_3_y_300k_500k_700k.PNG)](https://drive.google.com/open?id=1BPLb0tByoddafk8D9QIiKTvPog0vGlaH)
 
 ## Future Work <a name="Future"></a>
 - Stable Inter-Mesh Collisions (Inter-Mesh Collisions is aa work in progress)

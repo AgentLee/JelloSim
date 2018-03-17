@@ -173,10 +173,6 @@ So now if you perform an operation on vertices that only needs to use position d
 
 ## Miscellaneous Demos <a name="Demo"></a>
 
-#### Jello Cube
-
-[![](./Images/JelloCubeLink.png)](https://vimeo.com/260041318)
-
 ## Future Work <a name="Future"></a>
 - Stable Inter-Mesh Collisions (Inter-Mesh Collisions is aa work in progress)
 - Parallelization through CUDA so that you can run it on the GPU
